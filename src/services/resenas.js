@@ -64,6 +64,7 @@ export function guardarResena(usuario, titulo, datos, existente) {
     poster: titulo.poster || '',
     anio: titulo.anio || 0,
     paises: (titulo.paises || []).slice(0, 10),
+    generos: (titulo.generos || []).slice(0, 6),
     duracion: titulo.duracion || 0,
     creada: serverTimestamp(),
   })

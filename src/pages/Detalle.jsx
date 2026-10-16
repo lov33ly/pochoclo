@@ -1,72 +1,237 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { detalle, imagen } from '../lib/tmdb'
+import { estiloColor } from '../lib/color'
+import { bandera, nombreIdioma, nombrePais } from '../lib/paises'
+import { duracion, TIPOS } from '../lib/formato'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../context/AuthContext'
-import { escucharResenasDeTitulo, guardarResena, eliminarResena, idResena } from '../services/resenas'
+import { useToast } from '../context/ToastContext'
+import { escucharResenasDeTitulo, idResena } from '../services/resenas'
+import { escucharQuieroVer, agregarQuieroVer, quitarQuieroVer } from '../services/quieroVer'
+import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
+import { EstrellasFijas } from '../components/Estrellas'
+import Carrusel from '../components/Carrusel'
+import Ticket from '../components/Ticket'
+import ResenaEditor from '../components/ResenaEditor'
 
 export default function Detalle() {
   const { tipo, id } = useParams()
-  const { usuario } = useAuth()
-  const { datos: t, cargando, error } = useAsync(() => detalle(tipo, id), [tipo, id])
-  const [resenas, setResenas] = useState([])
-  const [puntaje, setPuntaje] = useState(3)
-  const [texto, setTexto] = useState('')
-  const [mensaje, setMensaje] = useState(null)
-
-  useEffect(
-    () => escucharResenasDeTitulo(tipo, id, setResenas, (e) => setMensaje(e.message)),
+  const valido = (tipo === 'movie' || tipo === 'tv') && /^\d+$/.test(id)
+  const { usuario, entrar } = useAuth()
+  const { avisar, avisarError } = useToast()
+  const { datos: t, cargando, error } = useAsync(
+    () => (valido ? detalle(tipo, id) : Promise.reject(new Error('Esa dirección no corresponde a ninguna película o serie.'))),
     [tipo, id],
   )
+  const [resenas, setResenas] = useState({ clave: null, lista: [] })
+  const [quieroVer, setQuieroVer] = useState([])
+  const [editor, setEditor] = useState(false)
+  const clave = `${tipo}_${id}`
 
-  const mia = usuario && resenas.find((r) => r.id === idResena(usuario.uid, tipo, Number(id)))
+  useEffect(() => {
+    if (!valido) return
+    return escucharResenasDeTitulo(
+      tipo,
+      id,
+      (lista) => setResenas({ clave, lista }),
+      (e) => avisarError('No se pudieron cargar las reseñas', e),
+    )
+  }, [tipo, id, clave, valido, avisarError])
 
-  async function guardar(e) {
-    e.preventDefault()
+  useEffect(() => {
+    if (!usuario) return
+    return escucharQuieroVer(usuario.uid, setQuieroVer, () => {})
+  }, [usuario])
+
+  const lista = useMemo(() => (resenas.clave === clave ? resenas.lista : []), [resenas, clave])
+  const mia = usuario ? lista.find((r) => r.id === idResena(usuario.uid, tipo, Number(id))) : null
+  const enLista = quieroVer.some((q) => q.id === clave)
+
+  const comunidad = useMemo(() => {
+    if (!lista.length) return null
+    const promedio = lista.reduce((s, r) => s + r.puntaje, 0) / lista.length
+    const barras = [1, 2, 3, 4, 5].map((n) => lista.filter((r) => Math.ceil(r.puntaje) === n).length)
+    return { promedio, barras, max: Math.max(...barras), gustos: lista.filter((r) => r.meGusta).length }
+  }, [lista])
+
+  async function alternarLista() {
+    if (!usuario) return entrar().catch(() => {})
     try {
-      await guardarResena(usuario, t, {
-        puntaje: Number(puntaje),
-        texto: texto.trim(),
-        meGusta: false,
-        spoiler: false,
-        vista: new Date().toISOString().slice(0, 10),
-      }, !!mia)
-      setMensaje('Reseña guardada')
-    } catch (err) {
-      setMensaje('Error: ' + err.message)
+      if (enLista) {
+        await quitarQuieroVer(usuario.uid, tipo, t.id)
+        avisar('Quitada de “Quiero ver”.')
+      } else {
+        await agregarQuieroVer(usuario.uid, t)
+        avisar('Agregada a “Quiero ver”.')
+      }
+    } catch (e) {
+      avisarError('No se pudo actualizar tu lista', e)
     }
   }
 
-  if (cargando) return <p>Cargando…</p>
-  if (error) return <p className="error">{error.message}</p>
+  if (cargando) return <Cargador texto="Preparando la función" />
+  if (error) return <div className="contenedor pagina"><ErrorCarga error={error} /></div>
+
+  const otros = lista.filter((r) => r.id !== mia?.id)
 
   return (
-    <article>
-      <h1>{t.titulo} ({t.anio})</h1>
-      <img src={imagen(t.poster)} alt="" width="200" />
-      <p>{t.resumen}</p>
+    <article className="ficha" style={estiloColor(t.id)}>
+      <section className="ficha__hero">
+        {t.fondo && (
+          <img className="ficha__fondo" src={imagen(t.fondo, 'w1280')} alt="" aria-hidden="true" />
+        )}
+        <div className="contenedor ficha__hero-interior">
+          {t.poster ? (
+            <img
+              key={t.id}
+              className="ficha__poster"
+              src={imagen(t.poster, 'w500')}
+              alt={`Póster de ${t.titulo}`}
+              style={{ viewTransitionName: 'poster-activo' }}
+              data-vt-activo=""
+            />
+          ) : (
+            <div className="ficha__poster ficha__poster--vacio">{t.titulo}</div>
+          )}
 
-      {usuario ? (
-        <form onSubmit={guardar}>
-          <select value={puntaje} onChange={(e) => setPuntaje(e.target.value)}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n}>{n}</option>)}
-          </select>
-          <textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Tu reseña" />
-          <button>{mia ? 'Actualizar' : 'Publicar'}</button>
-          {mia && <button type="button" onClick={() => eliminarResena(mia.id)}>Eliminar</button>}
-        </form>
-      ) : (
-        <p>Entrá con Google para reseñar.</p>
-      )}
-      {mensaje && <p>{mensaje}</p>}
+          <div className="ficha__info">
+            <p className="sobretitulo">
+              {TIPOS[t.tipo]} {t.anio && `· ${t.anio}`}
+            </p>
+            <h1 className="ficha__titulo">{t.titulo}</h1>
+            {t.tituloOriginal && t.tituloOriginal !== t.titulo && (
+              <p className="ficha__original">
+                “{t.tituloOriginal}” · en {nombreIdioma(t.idioma)}
+              </p>
+            )}
 
-      <h2>Reseñas</h2>
-      {resenas.map((r) => (
-        <div key={r.id} className="resena">
-          <Link to={`/u/${r.uid}`}>{r.autorNombre}</Link> — {r.puntaje}★
-          <p>{r.texto}</p>
+            <ul className="ficha__datos">
+              {t.paises.slice(0, 3).map((p) => (
+                <li key={p}>
+                  <span aria-hidden="true">{bandera(p)}</span> {nombrePais(p)}
+                </li>
+              ))}
+              {t.duracion && <li>{duracion(t.duracion)}{t.tipo === 'tv' && ' por episodio'}</li>}
+              {t.temporadas && <li>{t.temporadas} temporada{t.temporadas > 1 && 's'}</li>}
+              {t.generos.slice(0, 3).map((g) => <li key={g}>{g}</li>)}
+            </ul>
+
+            {t.direccion.length > 0 && (
+              <p className="ficha__direccion">
+                {t.tipo === 'movie' ? 'Dirigida por' : 'Creada por'} <strong>{t.direccion.slice(0, 2).join(' y ')}</strong>
+              </p>
+            )}
+
+            <div className="ficha__acciones">
+              {usuario ? (
+                <button className="boton boton--grande boton--claro" onClick={() => setEditor(true)}>
+                  {mia ? '✎ Editar mi reseña' : '★ Reseñar'}
+                </button>
+              ) : (
+                <button className="boton boton--grande boton--claro" onClick={() => entrar().catch(() => {})}>
+                  Entrá para reseñar
+                </button>
+              )}
+              <button
+                className={`boton boton--grande boton--contorno ${enLista ? 'activo' : ''}`}
+                onClick={alternarLista}
+                aria-pressed={enLista}
+                disabled={!!mia}
+                title={mia ? 'Ya la reseñaste' : undefined}
+              >
+                {mia ? '✓ Vista' : enLista ? '✓ En “Quiero ver”' : '+ Quiero ver'}
+              </button>
+            </div>
+          </div>
         </div>
-      ))}
+      </section>
+
+      <div className="contenedor ficha__cuerpo">
+        <section className="ficha__sinopsis">
+          {t.lema && <p className="ficha__lema">{t.lema}</p>}
+          <p>{t.resumen || 'Todavía no hay sinopsis en español para este título.'}</p>
+        </section>
+
+        <aside className="ficha__comunidad" aria-label="Puntajes">
+          <div className="marcador">
+            <span className="marcador__etiqueta">Pochoclo</span>
+            {comunidad ? (
+              <>
+                <span className="marcador__valor">{comunidad.promedio.toFixed(1)}</span>
+                <EstrellasFijas valor={Math.round(comunidad.promedio * 2) / 2} tamano={14} />
+                <span className="marcador__nota">
+                  {lista.length} reseña{lista.length > 1 && 's'} · {comunidad.gustos} ♥
+                </span>
+                <div className="histograma" aria-hidden="true">
+                  {comunidad.barras.map((b, i) => (
+                    <span key={i} style={{ height: `${comunidad.max ? (b / comunidad.max) * 100 : 0}%` }} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <span className="marcador__nota">Sin reseñas todavía</span>
+            )}
+          </div>
+          <div className="marcador marcador--tmdb">
+            <span className="marcador__etiqueta">TMDB</span>
+            <span className="marcador__valor">{(t.puntajeTmdb / 2).toFixed(1)}</span>
+            <span className="marcador__nota">{t.votos.toLocaleString('es-AR')} votos</span>
+          </div>
+        </aside>
+      </div>
+
+      {t.reparto.length > 0 && (
+        <section className="contenedor reparto">
+          <h2 className="titulo-seccion">Reparto</h2>
+          <ul className="reparto__lista">
+            {t.reparto.map((p) => (
+              <li key={p.id} className="persona">
+                {p.foto ? (
+                  <img src={imagen(p.foto, 'w185')} alt="" loading="lazy" />
+                ) : (
+                  <span className="persona__vacia" aria-hidden="true">🎭</span>
+                )}
+                <strong>{p.nombre}</strong>
+                <span>{p.personaje}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="contenedor resenas">
+        <h2 className="titulo-seccion">
+          Reseñas <span className="contador">{lista.length}</span>
+        </h2>
+        {mia && <Ticket resena={mia} propia onEditar={() => setEditor(true)} />}
+        {otros.map((r) => <Ticket key={r.id} resena={r} />)}
+        {lista.length === 0 && (
+          <Vacio icono="🎟️" titulo="Nadie la reseñó todavía">
+            {usuario ? (
+              <button className="boton" onClick={() => setEditor(true)}>Sé la primera persona</button>
+            ) : (
+              <Link to="#" onClick={(e) => { e.preventDefault(); entrar().catch(() => {}) }}>Entrá con Google y estrenala.</Link>
+            )}
+          </Vacio>
+        )}
+      </section>
+
+      {t.recomendadas.length > 0 && (
+        <div className="contenedor">
+          <Carrusel titulo="Si te gustó, mirá…" items={t.recomendadas} />
+        </div>
+      )}
+
+      {usuario && (
+        <ResenaEditor
+          abierto={editor}
+          titulo={t}
+          existente={mia}
+          enQuieroVer={enLista}
+          onCerrar={() => setEditor(false)}
+        />
+      )}
     </article>
   )
 }

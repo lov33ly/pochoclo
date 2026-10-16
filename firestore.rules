@@ -1,14 +1,101 @@
 rules_version = '2';
+
+// Reglas de Pochoclo
+// - Perfiles y reseñas son públicos para leer (es una red social de reseñas, como Letterboxd),
+//   pero solo su autor/a, con sesión iniciada, puede crearlos, modificarlos o borrarlos.
+// - La lista "Quiero ver" es privada: solo la ve y la modifica su dueño/a.
+// - Cada documento se valida: campos permitidos, tipos, rangos y largos máximos.
+// - Todo lo que no está permitido explícitamente queda denegado.
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function logueado() {
+      return request.auth != null;
+    }
+
+    function esUsuario(uid) {
+      return logueado() && request.auth.uid == uid;
+    }
+
+    function textoHasta(valor, max) {
+      return valor is string && valor.size() <= max;
+    }
+
+    // ---------- Perfiles ----------
+    function perfilValido(d) {
+      return d.keys().hasOnly(['nombre', 'foto', 'bio', 'creado'])
+        && textoHasta(d.nombre, 80) && d.nombre.size() > 0
+        && textoHasta(d.foto, 500)
+        && textoHasta(d.bio, 160);
+    }
+
     match /usuarios/{uid} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow create: if esUsuario(uid)
+        && perfilValido(request.resource.data)
+        && request.resource.data.creado == request.time;
+      allow update: if esUsuario(uid)
+        && perfilValido(request.resource.data)
+        && request.resource.data.creado == resource.data.creado;
+      allow delete: if false;
+
+      // Lista privada "Quiero ver"
+      match /quieroVer/{itemId} {
+        allow read, delete: if esUsuario(uid);
+        allow create, update: if esUsuario(uid)
+          && request.resource.data.keys().hasOnly(['tipo', 'tmdbId', 'titulo', 'poster', 'anio', 'agregada'])
+          && request.resource.data.tipo in ['movie', 'tv']
+          && request.resource.data.tmdbId is int
+          && itemId == request.resource.data.tipo + '_' + string(request.resource.data.tmdbId)
+          && textoHasta(request.resource.data.titulo, 300)
+          && textoHasta(request.resource.data.poster, 200)
+          && request.resource.data.anio is int;
+      }
     }
+
+    // ---------- Reseñas ----------
+    function contenidoValido(d) {
+      return d.puntaje is number && d.puntaje >= 0.5 && d.puntaje <= 5
+        && (d.puntaje * 2) == math.floor(d.puntaje * 2)
+        && textoHasta(d.texto, 2000)
+        && d.meGusta is bool
+        && d.spoiler is bool
+        && d.vista is string && d.vista.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    function resenaValida(d, resenaId) {
+      return d.keys().hasOnly(['uid', 'autorNombre', 'autorFoto', 'clave', 'tipo', 'tmdbId', 'titulo',
+                               'poster', 'anio', 'paises', 'generos', 'duracion', 'puntaje', 'texto',
+                               'meGusta', 'spoiler', 'vista', 'creada', 'actualizada'])
+        && d.uid == request.auth.uid
+        && d.tipo in ['movie', 'tv']
+        && d.tmdbId is int
+        && d.clave == d.tipo + '_' + string(d.tmdbId)
+        && resenaId == d.uid + '_' + d.clave
+        && textoHasta(d.autorNombre, 80)
+        && textoHasta(d.autorFoto, 500)
+        && textoHasta(d.titulo, 300)
+        && textoHasta(d.poster, 200)
+        && d.anio is int
+        && d.paises is list && d.paises.size() <= 10
+        && d.generos is list && d.generos.size() <= 6
+        && d.duracion is int
+        && contenidoValido(d);
+    }
+
     match /resenas/{resenaId} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if logueado()
+        && resenaValida(request.resource.data, resenaId)
+        && request.resource.data.creada == request.time;
+      // Al editar solo pueden cambiar el puntaje, el texto, "me gustó", spoiler y la fecha.
+      allow update: if logueado()
+        && resource.data.uid == request.auth.uid
+        && resenaValida(request.resource.data, resenaId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['puntaje', 'texto', 'meGusta', 'spoiler', 'vista', 'actualizada']);
+      allow delete: if logueado() && resource.data.uid == request.auth.uid;
     }
   }
 }
