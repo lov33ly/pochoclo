@@ -13,7 +13,7 @@ import {
   limit,
   serverTimestamp,
 } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, sinFirebase } from '../firebase'
 
 const resenasRef = () => collection(db, 'resenas')
 export const idResena = (uid, tipo, tmdbId) => `${uid}_${tipo}_${tmdbId}`
@@ -23,18 +23,24 @@ const mapear = (snap) => snap.docs.map((d) => ({ id: d.id, ...d.data() }))
 
 // CONSULTAR: reseñas de un título (de toda la comunidad)
 export function escucharResenasDeTitulo(tipo, tmdbId, onDatos, onError) {
+  const corte = sinFirebase(onError)
+  if (corte) return corte
   const q = query(resenasRef(), where('clave', '==', `${tipo}_${tmdbId}`), limit(60))
   return onSnapshot(q, (s) => onDatos(mapear(s).sort(porFecha)), onError)
 }
 
 // CONSULTAR: reseñas de una persona (para su perfil)
 export function escucharResenasDeUsuario(uid, onDatos, onError) {
+  const corte = sinFirebase(onError)
+  if (corte) return corte
   const q = query(resenasRef(), where('uid', '==', uid), limit(500))
   return onSnapshot(q, (s) => onDatos(mapear(s).sort(porFecha)), onError)
 }
 
 // CONSULTAR: actividad reciente de toda la comunidad
 export function escucharUltimasResenas(cantidad, onDatos, onError) {
+  const corte = sinFirebase(onError)
+  if (corte) return corte
   const q = query(resenasRef(), orderBy('creada', 'desc'), limit(cantidad))
   return onSnapshot(q, (s) => onDatos(mapear(s)), onError)
 }

@@ -550,7 +550,7 @@ textarea[aria-invalid='true'] { border-color: var(--error); }
   .ficha__hero-interior { grid-template-columns: minmax(200px, 300px) 1fr; gap: 48px; align-items: end; padding-top: 80px; padding-bottom: 56px; }
 }
 .ficha__poster {
-  width: min(60vw, 300px);
+  width: min(46vw, 300px);
   aspect-ratio: 2 / 3;
   object-fit: cover;
   border: 3px solid var(--tinta);
@@ -765,6 +765,11 @@ textarea[aria-invalid='true'] { border-color: var(--error); }
 .volver { display: inline-block; margin-bottom: 12px; font-weight: 700; text-decoration: none; }
 .volver:hover { text-decoration: underline; }
 .nav__ruleta { border: 0; background: none; color: inherit; }
+
+/* ---------- Error de ruta ---------- */
+
+.error-ruta { display: grid; gap: 24px; }
+.error-ruta__marca { color: var(--tinta); }
 
 /* ---------- Actividad de la comunidad ---------- */
 

@@ -134,7 +134,7 @@ export default function Inicio() {
   const { abrirRuleta } = useOutletContext()
   const tendencias = useLista('trending/all/week')
   const pelis = useLista('movie/popular', { region: 'AR' }, 'movie')
-  const series = useLista('tv/popular', undefined, 'tv')
+  const series = useLista('trending/tv/week', undefined, 'tv')
   const joyas = useLista(
     'discover/movie',
     { sort_by: 'vote_average.desc', 'vote_count.gte': 1500, without_original_language: 'en' },

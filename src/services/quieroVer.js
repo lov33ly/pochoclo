@@ -1,10 +1,12 @@
 // Lista "Quiero ver" (privada): usuarios/{uid}/quieroVer/{tipo}_{tmdbId}
 import { collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, sinFirebase } from '../firebase'
 
 const ref = (uid) => collection(db, 'usuarios', uid, 'quieroVer')
 
 export function escucharQuieroVer(uid, onDatos, onError) {
+  const corte = sinFirebase(onError)
+  if (corte) return corte
   return onSnapshot(
     ref(uid),
     (s) =>

@@ -12,20 +12,27 @@ import Perfil from './pages/Perfil'
 import Mundo from './pages/Mundo'
 import Pais from './pages/Pais'
 import NoEncontrado from './pages/NoEncontrado'
+import ErrorRuta from './pages/ErrorRuta'
 import './styles/index.css'
 
 const router = createBrowserRouter([
   {
     path: '/',
     Component: Layout,
+    ErrorBoundary: ErrorRuta,
     children: [
-      { index: true, Component: Inicio },
-      { path: 'buscar', Component: Buscar },
-      { path: 'mundo', Component: Mundo },
-      { path: 'mundo/:codigo', Component: Pais },
-      { path: ':tipo/:id', Component: Detalle },
-      { path: 'u/:uid', Component: Perfil },
-      { path: '*', Component: NoEncontrado },
+      {
+        ErrorBoundary: ErrorRuta,
+        children: [
+          { index: true, Component: Inicio },
+          { path: 'buscar', Component: Buscar },
+          { path: 'mundo', Component: Mundo },
+          { path: 'mundo/:codigo', Component: Pais },
+          { path: ':tipo/:id', Component: Detalle },
+          { path: 'u/:uid', Component: Perfil },
+          { path: '*', Component: NoEncontrado },
+        ],
+      },
     ],
   },
 ])

@@ -24,7 +24,7 @@ export default function Detalle() {
     () => (valido ? detalle(tipo, id) : Promise.reject(new Error('Esa dirección no corresponde a ninguna película o serie.'))),
     [tipo, id],
   )
-  const [resenas, setResenas] = useState({ clave: null, lista: [] })
+  const [resenas, setResenas] = useState({ clave: null, lista: [], error: null })
   const [quieroVer, setQuieroVer] = useState([])
   const [editor, setEditor] = useState(false)
   const clave = `${tipo}_${id}`
@@ -34,10 +34,10 @@ export default function Detalle() {
     return escucharResenasDeTitulo(
       tipo,
       id,
-      (lista) => setResenas({ clave, lista }),
-      (e) => avisarError('No se pudieron cargar las reseñas', e),
+      (lista) => setResenas({ clave, lista, error: null }),
+      (error) => setResenas({ clave, lista: [], error }),
     )
-  }, [tipo, id, clave, valido, avisarError])
+  }, [tipo, id, clave, valido])
 
   useEffect(() => {
     if (!usuario) return
@@ -204,9 +204,12 @@ export default function Detalle() {
         <h2 className="titulo-seccion">
           Reseñas <span className="contador">{lista.length}</span>
         </h2>
+        {resenas.error && resenas.clave === clave && (
+          <p className="aviso aviso--error">No se pudieron cargar las reseñas: {resenas.error.message}</p>
+        )}
         {mia && <Ticket resena={mia} propia onEditar={() => setEditor(true)} />}
         {otros.map((r) => <Ticket key={r.id} resena={r} />)}
-        {lista.length === 0 && (
+        {lista.length === 0 && !resenas.error && (
           <Vacio icono="🎟️" titulo="Nadie la reseñó todavía">
             {usuario ? (
               <button className="boton" onClick={() => setEditor(true)}>Sé la primera persona</button>

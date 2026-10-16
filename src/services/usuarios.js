@@ -1,6 +1,6 @@
 // Perfiles públicos: usuarios/{uid}
 import { doc, getDoc, setDoc, updateDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, sinFirebase } from '../firebase'
 
 // Crea el perfil la primera vez que alguien entra; después solo actualiza nombre y foto.
 export async function asegurarPerfil(user) {
@@ -15,6 +15,8 @@ export async function asegurarPerfil(user) {
 }
 
 export function escucharPerfil(uid, onDatos, onError) {
+  const corte = sinFirebase(onError)
+  if (corte) return corte
   return onSnapshot(
     doc(db, 'usuarios', uid),
     (snap) => onDatos(snap.exists() ? { uid, ...snap.data() } : null),

@@ -17,3 +17,10 @@ const app = configCompleta ? initializeApp(firebaseConfig) : null
 export const auth = app ? getAuth(app) : null
 export const db = app ? getFirestore(app) : null
 export const proveedorGoogle = new GoogleAuthProvider()
+
+// Si Firebase no está configurado, las suscripciones avisan el error en vez de romper la app.
+export function sinFirebase(onError) {
+  if (db) return null
+  setTimeout(() => onError?.(new Error('Firebase no está configurado (faltan variables de entorno).')))
+  return () => {}
+}
