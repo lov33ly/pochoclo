@@ -4,10 +4,12 @@ import { useAuth } from '../context/AuthContext'
 import { configCompleta } from '../firebase'
 import Logo from './Logo'
 import Avatar from './Avatar'
+import Ruleta from './Ruleta'
 
 const SECCIONES = [
   { to: '/', etiqueta: 'Inicio', icono: '🏠', end: true },
   { to: '/buscar', etiqueta: 'Buscar', icono: '🔎' },
+  { to: '/mundo', etiqueta: 'Mundo', icono: '🌎' },
 ]
 
 export default function Layout() {
@@ -16,6 +18,7 @@ export default function Layout() {
   const navegando = useNavigation().state === 'loading'
   const [q, setQ] = useState('')
   const [menu, setMenu] = useState(false)
+  const [ruleta, setRuleta] = useState(false)
 
   function buscar(e) {
     e.preventDefault()
@@ -39,6 +42,9 @@ export default function Layout() {
               {s.etiqueta}
             </NavLink>
           ))}
+          <button className="nav__link nav__ruleta" onClick={() => setRuleta(true)}>
+            🎰 Ruleta
+          </button>
         </nav>
 
         <form className="nav__buscar" onSubmit={buscar} role="search">
@@ -79,7 +85,7 @@ export default function Layout() {
       )}
 
       <main id="contenido" className="principal">
-        <Outlet />
+        <Outlet context={{ abrirRuleta: () => setRuleta(true) }} />
       </main>
 
       <footer className="pie">
@@ -104,6 +110,10 @@ export default function Layout() {
             {s.etiqueta}
           </NavLink>
         ))}
+        <button className="tabbar__item" onClick={() => setRuleta(true)}>
+          <span aria-hidden="true">🎰</span>
+          Ruleta
+        </button>
         {usuario ? (
           <NavLink to={`/u/${usuario.uid}`} viewTransition className="tabbar__item">
             <Avatar nombre={usuario.displayName || '?'} foto={usuario.photoURL} tamano={22} />
@@ -117,6 +127,7 @@ export default function Layout() {
         )}
       </nav>
 
+      <Ruleta abierto={ruleta} onCerrar={() => setRuleta(false)} />
       <ScrollRestoration />
     </div>
   )

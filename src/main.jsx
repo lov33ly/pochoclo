@@ -9,6 +9,8 @@ import Inicio from './pages/Inicio'
 import Buscar from './pages/Buscar'
 import Detalle from './pages/Detalle'
 import Perfil from './pages/Perfil'
+import Mundo from './pages/Mundo'
+import Pais from './pages/Pais'
 import NoEncontrado from './pages/NoEncontrado'
 import './styles/index.css'
 
@@ -19,6 +21,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Inicio },
       { path: 'buscar', Component: Buscar },
+      { path: 'mundo', Component: Mundo },
+      { path: 'mundo/:codigo', Component: Pais },
       { path: ':tipo/:id', Component: Detalle },
       { path: 'u/:uid', Component: Perfil },
       { path: '*', Component: NoEncontrado },

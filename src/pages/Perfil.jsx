@@ -1,14 +1,70 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import { escucharResenasDeUsuario } from '../services/resenas'
-import { escucharPerfil } from '../services/usuarios'
+import { escucharPerfil, actualizarBio } from '../services/usuarios'
 import { escucharQuieroVer } from '../services/quieroVer'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import { mes } from '../lib/formato'
 import Avatar from '../components/Avatar'
 import Poster from '../components/Poster'
 import Ticket from '../components/Ticket'
+import Pasaporte from '../components/Pasaporte'
+import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
+
+const MAX_BIO = 160
+
+// Bio editable solo en el perfil propio.
+function Bio({ uid, bio, propio }) {
+  const { avisar, avisarError } = useToast()
+  const [editando, setEditando] = useState(false)
+  const [texto, setTexto] = useState(bio)
+  const [guardando, setGuardando] = useState(false)
+
+  async function guardar(e) {
+    e.preventDefault()
+    if (texto.length > MAX_BIO) return
+    setGuardando(true)
+    try {
+      await actualizarBio(uid, texto.trim())
+      avisar('Bio actualizada.')
+      setEditando(false)
+    } catch (err) {
+      avisarError('No se pudo guardar la bio', err)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  if (editando)
+    return (
+      <form className="bio bio--editando" onSubmit={guardar}>
+        <input
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          maxLength={MAX_BIO}
+          placeholder="Ej.: fan del cine coreano y de las comedias de los 90"
+          aria-label="Tu bio"
+          autoFocus
+        />
+        <span className="bio__contador">{texto.length}/{MAX_BIO}</span>
+        <button className="boton boton--chico" disabled={guardando}>{guardando ? '…' : 'Guardar'}</button>
+        <button type="button" className="enlace" onClick={() => { setTexto(bio); setEditando(false) }}>Cancelar</button>
+      </form>
+    )
+
+  return (
+    <p className="bio">
+      {bio || (propio ? 'Todavía no escribiste tu bio.' : '')}
+      {propio && (
+        <button className="enlace bio__editar" onClick={() => setEditando(true)}>
+          {bio ? 'Editar' : 'Escribir bio'}
+        </button>
+      )}
+    </p>
+  )
+}
 
 export default function Perfil() {
   const { uid } = useParams()
@@ -38,6 +94,7 @@ export default function Perfil() {
       series: mias.length - pelis.length,
       horas: Math.round(pelis.reduce((s, r) => s + (r.duracion || 0), 0) / 60),
       promedio: mias.length ? (mias.reduce((s, r) => s + r.puntaje, 0) / mias.length).toFixed(1) : '–',
+      paises: new Set(mias.flatMap((r) => r.paises || [])).size,
     }
   }, [mias])
 
@@ -66,6 +123,8 @@ export default function Perfil() {
   const PESTANAS = [
     ['diario', 'Diario', mias.length],
     ['grilla', 'Pósters', mias.length],
+    ['pasaporte', 'Pasaporte', cifras.paises],
+    ['stats', 'Estadísticas', null],
     ...(propio ? [['quiero', 'Quiero ver', lista.length]] : []),
   ]
 
@@ -77,11 +136,13 @@ export default function Perfil() {
           <div className="perfil__nombre">
             <p className="sobretitulo">{propio ? 'Tu perfil' : 'Perfil'}</p>
             <h1 className="titulo-pagina">{datos.nombre}</h1>
+            <Bio key={datos.bio} uid={uid} bio={datos.bio || ''} propio={propio} />
           </div>
           <dl className="cifras">
             <div><dt>Películas</dt><dd>{cifras.pelis}</dd></div>
             <div><dt>Series</dt><dd>{cifras.series}</dd></div>
             <div><dt>Horas de cine</dt><dd>{cifras.horas}</dd></div>
+            <div><dt>Países</dt><dd>{cifras.paises}</dd></div>
             <div><dt>Promedio</dt><dd>{cifras.promedio}</dd></div>
           </dl>
         </div>
@@ -96,7 +157,7 @@ export default function Perfil() {
               aria-current={pestana === v ? 'page' : undefined}
               onClick={() => setParams({ ver: v }, { replace: true })}
             >
-              {etiqueta} <span className="contador">{n}</span>
+              {etiqueta} {n != null && <span className="contador">{n}</span>}
             </button>
           ))}
         </nav>
@@ -129,6 +190,9 @@ export default function Perfil() {
               ))}
             </div>
           ))}
+
+        {pestana === 'pasaporte' && <Pasaporte resenas={mias} propio={propio} />}
+        {pestana === 'stats' && <Estadisticas resenas={mias} />}
 
         {pestana === 'quiero' &&
           propio &&
