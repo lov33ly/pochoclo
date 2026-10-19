@@ -143,6 +143,14 @@ export default function Layout() {
         )}
       </nav>
 
+      {/* Filtro SVG de "tinta corrida": bordes irregulares para sellos y titulares impresos */}
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <filter id="tinta">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="ruido" />
+          <feDisplacementMap in="SourceGraphic" in2="ruido" scale="3" />
+        </filter>
+      </svg>
+
       <Ruleta abierto={ruleta} onCerrar={() => setRuleta(false)} />
       <ScrollRestoration />
     </div>

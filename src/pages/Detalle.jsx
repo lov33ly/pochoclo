@@ -16,7 +16,21 @@ import Seccion from '../components/Seccion'
 import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
 import ResenaForm from '../components/ResenaForm'
+import Circulos from '../components/Circulos'
+import Cinta from '../components/Cinta'
 import { resenasTmdb, resenasEjemplo } from '../lib/resenasExtra'
+
+// De la paleta del fotograma se eligen los colores con más vida (ni muy oscuros ni grises)
+// para los círculos de la portada; si no hay, se usan el rojo y el azul de la marca.
+function coloresVivos(paleta) {
+  const vivos = (paleta || []).filter((c) => {
+    const [r, g, b] = c.rgb.split(',').map((n) => Number(n) / 255)
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    return max > 0.35 && max - min > 0.18
+  })
+  return vivos.length >= 2 ? vivos.slice(0, 3).map((c) => c.hex) : ['#EE3524', '#2442D6', '#4A90E6']
+}
 
 // Cuanto más corto el título, más alto el titular (siempre ocupa todo el ancho).
 const proporcionTitulo = (t) => Math.min(0.34, Math.max(0.13, 3.4 / t.length))
@@ -98,6 +112,7 @@ export default function Detalle() {
     <article className="ficha">
       {/* ---------- Portada ---------- */}
       <header className="contenedor ficha__portada">
+        <Circulos colores={coloresVivos(paleta)} semilla={t.id} cantidad={3} className="ficha__circulos" />
         <p className="rotulo">
           {TIPOS[t.tipo]} · {t.anio || 'S/F'}
         </p>
@@ -129,6 +144,8 @@ export default function Detalle() {
           ) : (
             <div className="ficha__poster ficha__poster--vacio">{t.titulo}</div>
           )}
+          <Cinta arriba={-12} izquierda="-6%" giro={-32} ancho={96} />
+          <Cinta abajo={-10} derecha="-8%" giro={-28} ancho={90} />
         </figure>
         {t.fondo && (
           <figure className="ficha__fotograma">

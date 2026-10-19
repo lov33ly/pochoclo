@@ -3,11 +3,13 @@ import { REGIONES } from '../lib/mundo'
 import { nombrePais } from '../lib/paises'
 import TextoEscalado from '../components/TextoEscalado'
 import Seccion from '../components/Seccion'
+import Circulos from '../components/Circulos'
 
 export default function Mundo() {
   return (
     <div className="contenedor pagina">
-      <header className="portada">
+      <header className="portada portada--circulos">
+        <Circulos colores={['#EE3524']} semilla={7} cantidad={4} />
         <p className="rotulo">Vuelta al mundo</p>
         <TextoEscalado como="h1" proporcion={0.3} maximo={360}>MUNDO</TextoEscalado>
         <p className="portada__bajada">

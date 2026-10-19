@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router'
 import { tmdb, listar } from '../lib/tmdb'
 import Poster from '../components/Poster'
 import TextoEscalado from '../components/TextoEscalado'
+import Circulos from '../components/Circulos'
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../components/Estados'
 
 const FILTROS = [
@@ -57,7 +58,8 @@ export default function Buscar() {
 
   return (
     <div className="contenedor pagina">
-      <header className="portada">
+      <header className="portada portada--circulos">
+        <Circulos colores={['#2442D6', '#4A90E6']} semilla={3} cantidad={2} />
         <p className="rotulo">Buscador</p>
         <TextoEscalado como="h1" proporcion={0.24} maximo={300}>¿QUÉ VISTE?</TextoEscalado>
       </header>

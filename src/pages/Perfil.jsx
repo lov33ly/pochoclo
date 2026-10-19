@@ -10,6 +10,7 @@ import Avatar from '../components/Avatar'
 import Poster from '../components/Poster'
 import Resena from '../components/Resena'
 import TextoEscalado from '../components/TextoEscalado'
+import Circulos from '../components/Circulos'
 import Pasaporte from '../components/Pasaporte'
 import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
@@ -132,7 +133,8 @@ export default function Perfil() {
   return (
     <div className="perfil">
       <header className="perfil__cabecera">
-        <div className="contenedor">
+        <div className="contenedor perfil__interior">
+          <Circulos colores={['#2442D6', '#4A90E6']} semilla={uid.length * 97} cantidad={4} modo="screen" className="perfil__circulos" />
           <p className="rotulo rotulo--doble">
             <span>{propio ? 'Tu perfil' : 'Perfil'}</span>
             <span>{mias.length} reseñas</span>

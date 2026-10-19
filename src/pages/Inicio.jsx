@@ -11,12 +11,13 @@ import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
 import Seccion from '../components/Seccion'
 import TextoEscalado from '../components/TextoEscalado'
+import Cinta from '../components/Cinta'
 
 function useLista(ruta, params, tipo) {
   return useAsync(() => tmdb(ruta, params).then((d) => listar(d, tipo)), [ruta, params, tipo])
 }
 
-// Portada: el nombre en escala libre y un fotograma en cartelera que rota.
+// Portada: fotograma en duotono azul, el nombre gigante en rojo encima y la película en cartelera.
 function Portada({ items, abrirRuleta }) {
   const [i, setI] = useState(0)
   const destacados = items.filter((t) => t.fondo).slice(0, 6)
@@ -30,41 +31,46 @@ function Portada({ items, abrirRuleta }) {
 
   return (
     <section className="portada-inicio">
-      <div className="contenedor">
-        <p className="rotulo">Reseñas de cine y series</p>
-        <TextoEscalado como="h1" proporcion={0.25} maximo={340} className="portada-inicio__marca">
+      {destacados.map((d) => (
+        <img
+          key={d.id}
+          src={imagen(d.fondo, 'w1280')}
+          alt=""
+          aria-hidden="true"
+          className={`portada-inicio__fondo ${d === t ? 'portada-inicio__fondo--activo' : ''}`}
+        />
+      ))}
+
+      <div className="contenedor portada-inicio__interior">
+        <p className="portada-inicio__barra">
+          <span>Reseñas de cine y series</span>
+          <span>Todo el mundo, todas las películas</span>
+        </p>
+
+        <TextoEscalado como="h1" proporcion={0.3} maximo={420} className="portada-inicio__marca">
           POCHOCLO
         </TextoEscalado>
 
         <div className="portada-inicio__grilla">
-          <div className="portada-inicio__texto">
-            <p className="portada-inicio__lema">
-              Todas las películas y series del mundo. Tu diario, tus puntajes, tu pasaporte de cine.
-            </p>
+          <div>
+            <p className="portada-inicio__lema">Tu diario, tus puntajes, tu pasaporte de cine.</p>
             <div className="portada-inicio__acciones">
-              <Link to="/buscar" viewTransition className="boton boton--blanco">Buscar un título</Link>
+              <Link to="/buscar" viewTransition className="boton boton--rojo">Buscar un título</Link>
               <button className="boton boton--contorno" onClick={abrirRuleta}>No sé qué ver</button>
             </div>
           </div>
 
           {t && (
             <Link to={`/${t.tipo}/${t.id}`} viewTransition onClick={marcarTransicion} className="cartelera">
-              <div className="cartelera__marco">
-                {destacados.map((d) => (
-                  <img
-                    key={d.id}
-                    src={imagen(d.fondo, 'w1280')}
-                    alt=""
-                    className={`cartelera__img ${d === t ? 'cartelera__img--activa' : ''}`}
-                  />
-                ))}
+              <span className="cartelera__poster-caja">
                 <img src={imagen(t.poster, 'w185')} alt="" data-vt className="cartelera__poster" />
-              </div>
-              <p className="cartelera__pie">
-                <span>En cartelera</span>
+                <Cinta arriba={-10} izquierda="18%" giro={-6} ancho={70} />
+              </span>
+              <span className="cartelera__texto">
+                <span className="cartelera__rotulo">En cartelera</span>
                 <strong key={t.id}>{t.titulo}</strong>
                 <span>{TIPOS[t.tipo]} · {t.anio}</span>
-              </p>
+              </span>
             </Link>
           )}
         </div>
