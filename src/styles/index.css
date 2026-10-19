@@ -547,11 +547,11 @@ textarea[aria-invalid='true'] { border-color: var(--rojo); }
 
 .cartelera { display: flex; align-items: flex-end; gap: 16px; text-decoration: none; }
 .cartelera__poster-caja { position: relative; flex: none; }
-.cartelera__poster { width: 120px; aspect-ratio: 2 / 3; object-fit: cover; transform: rotate(2deg); box-shadow: 6px 6px 0 var(--negro); transition: transform 0.3s; }
-.cartelera:hover .cartelera__poster { transform: rotate(-1deg) scale(1.04); }
+.cartelera__poster { width: 120px; aspect-ratio: 2 / 3; object-fit: cover; box-shadow: 6px 6px 0 var(--negro); transition: transform 0.25s ease; }
+.cartelera:hover .cartelera__poster { transform: scale(1.04); }
 .cartelera__texto { display: grid; gap: 2px; max-width: 220px; }
 .cartelera__rotulo { width: fit-content; padding: 2px 6px; background: var(--rojo); color: var(--blanco); font-family: var(--display); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-.cartelera__texto strong { font-family: var(--display); font-size: 22px; line-height: 1.05; letter-spacing: -0.02em; animation: aparecer 0.5s; }
+.cartelera__texto strong { font-family: var(--display); font-size: 22px; line-height: 1.05; letter-spacing: -0.02em; }
 .cartelera__texto > span:last-child { font-size: 12px; text-transform: uppercase; font-family: var(--display); font-weight: 700; opacity: 0.8; }
 
 /* ---------- Portadas de color (PortadaColor.jsx) ---------- */
