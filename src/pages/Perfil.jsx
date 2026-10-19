@@ -70,8 +70,6 @@ export default function Perfil() {
     <div className="perfil">
       <PortadaColor
         color="negro"
-        rotulo={propio ? 'Tu perfil' : 'Perfil'}
-        rotuloDerecha={`${mias.length} ${mias.length === 1 ? 'reseña' : 'reseñas'}`}
         titulo={datos.nombre}
         proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))}
         maximo={300}
