@@ -68,14 +68,14 @@ button:disabled { cursor: not-allowed; opacity: 0.4; }
 }
 
 /* Círculos de afiche (ver Circulos.jsx) */
-.circulos { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.circulos { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .circulos__item {
   position: absolute;
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--c);
   mix-blend-mode: var(--modo);
-  opacity: 0.92;
+  opacity: 0.85;
   animation: circulo-entra 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 @keyframes circulo-entra { from { transform: scale(0.6); opacity: 0; } }
@@ -153,9 +153,9 @@ button:disabled { cursor: not-allowed; opacity: 0.4; }
 }
 
 .portada { padding-bottom: 24px; }
-.portada--circulos { position: relative; }
-.portada--circulos .circulos { left: 30%; right: -4%; top: -20px; bottom: auto; height: calc(100% - 110px); }
-.portada--circulos .portada__bajada { position: relative; z-index: 2; }
+.portada--circulos { position: relative; isolation: isolate; }
+.portada--circulos > :not(.circulos) { position: relative; z-index: 1; }
+.portada--circulos .circulos { left: 30%; right: -4%; top: -20px; bottom: auto; height: 100%; }
 .portada .escalado { margin-top: 8px; }
 .portada__bajada { max-width: 52ch; margin: 20px 0 0; font-size: 18px; line-height: 1.55; }
 
@@ -640,9 +640,11 @@ textarea[aria-invalid='true'] { border-color: var(--rojo); }
 
 /* ---------- Ficha de película / serie ---------- */
 
+.ficha { position: relative; isolation: isolate; }
 .ficha__portada { position: relative; padding-top: 12px; }
-.ficha__circulos { left: 38%; right: 0; top: 0; height: 120%; }
-.ficha__circulos .circulos__item { opacity: 0.88; }
+.ficha__portada > :not(.circulos) { position: relative; z-index: 1; }
+.ficha__circulos { left: 40%; right: -2%; top: -10px; height: 160%; }
+.ficha__visual, .ficha__columnas { position: relative; z-index: 1; }
 .ficha__portada .escalado { margin-top: 8px; }
 .ficha__original { margin: 12px 0 0; font-size: 15px; }
 .ficha__visual { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
