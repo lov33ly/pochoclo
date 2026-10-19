@@ -420,8 +420,8 @@ textarea[aria-invalid='true'] { border-color: var(--rojo); }
   filter: grayscale(1) contrast(1.08);
   transition: filter 0.35s, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.poster:hover .poster__img, .poster:focus-visible .poster__img { transform: scale(1.04); }
-/* Lo que ya reseñaste se ve en color; lo que no, en blanco y negro */
+/* Blanco y negro por defecto; color al pasar el cursor. Lo que ya reseñaste queda siempre en color. */
+.poster:hover .poster__img, .poster:focus-visible .poster__img { filter: none; transform: scale(1.04); }
 .poster--vista .poster__img { filter: none; }
 .poster__img--vacio {
   display: flex;
@@ -805,7 +805,7 @@ textarea[aria-invalid='true'] { border-color: var(--rojo); }
 .resena--propia .resena__nota, .resena--propia .estrellas, .resena--propia .resena__pie, .resena--propia .resena__pie .enlace, .resena--propia .resena__corazon { color: var(--hueso); }
 .resena--propia { --estrella-vacia: #555; }
 .resena__poster img, .resena__poster span { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: var(--gris-1); filter: grayscale(1); transition: filter 0.3s; }
-.resena__poster--vista img { filter: none; }
+.resena:hover .resena__poster img, .resena__poster--vista img { filter: none; }
 .resena__nota { margin: 0; color: var(--negro); font-family: var(--display); font-size: clamp(48px, 6vw, 72px); font-weight: 700; line-height: 0.8; letter-spacing: -0.06em; }
 .resena__cuerpo { display: grid; gap: 10px; align-content: start; min-width: 0; }
 .resena__cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
