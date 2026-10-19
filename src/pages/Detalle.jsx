@@ -16,8 +16,6 @@ import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
 import ResenaForm from '../components/ResenaForm'
 import PortadaColor from '../components/PortadaColor'
-import Marquesina from '../components/Marquesina'
-import Cinta from '../components/Cinta'
 import { resenasTmdb, resenasEjemplo } from '../lib/resenasExtra'
 
 // Cuanto más corto el título, más alto el titular (siempre ocupa todo el ancho).
@@ -122,8 +120,6 @@ export default function Detalle() {
             ) : (
               <div className="ficha__poster ficha__poster--vacio">{t.titulo}</div>
             )}
-            <Cinta arriba={-12} izquierda="-10%" giro={-32} ancho={90} />
-            <Cinta abajo={-8} derecha="-12%" giro={-28} ancho={84} />
           </figure>
           <div className="ficha__datos-portada">
             {t.tituloOriginal && t.tituloOriginal !== t.titulo && (
@@ -149,17 +145,6 @@ export default function Detalle() {
           </div>
         </div>
       </PortadaColor>
-
-      <Marquesina
-        items={[
-          t.titulo,
-          t.direccion[0],
-          t.anio,
-          ...t.paises.slice(0, 2).map(nombrePais),
-          ...t.generos.slice(0, 3),
-          t.duracion ? timecode(t.duracion) : null,
-        ]}
-      />
 
       <div className="contenedor ficha__columnas">
         <Seccion titulo="Sinopsis">
