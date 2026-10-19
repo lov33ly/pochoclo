@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { tmdb, listar } from '../lib/tmdb'
 import Poster from '../components/Poster'
+import TextoEscalado from '../components/TextoEscalado'
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../components/Estados'
 
 const FILTROS = [
@@ -56,9 +57,9 @@ export default function Buscar() {
 
   return (
     <div className="contenedor pagina">
-      <header className="pagina__cabecera">
-        <p className="sobretitulo">Buscador</p>
-        <h1 className="titulo-pagina">¿Qué viste?</h1>
+      <header className="portada">
+        <p className="rotulo">Buscador</p>
+        <TextoEscalado como="h1" proporcion={0.24} maximo={300}>¿QUÉ VISTE?</TextoEscalado>
       </header>
 
       <div className="buscador">
@@ -86,7 +87,7 @@ export default function Buscar() {
       </div>
 
       {!q ? (
-        <Vacio icono="🎬" titulo="Buscá cualquier película o serie del mundo">
+        <Vacio titulo="Buscá cualquier película o serie del mundo">
           Más de un millón de títulos: desde Hollywood hasta el cine iraní, el anime o las telenovelas.
         </Vacio>
       ) : cargando ? (
@@ -94,7 +95,7 @@ export default function Buscar() {
       ) : estado.error ? (
         <ErrorCarga error={estado.error} />
       ) : items.length === 0 ? (
-        <Vacio icono="🍿" titulo={`Nada para “${q}”`}>Probá con el título original o en otro idioma.</Vacio>
+        <Vacio titulo={`Nada para “${q}”`}>Probá con el título original o en otro idioma.</Vacio>
       ) : (
         <>
           <div className="grilla">

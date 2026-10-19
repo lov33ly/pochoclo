@@ -10,7 +10,7 @@ export default function ErrorRuta() {
         <Logo /> <span>pochoclo</span>
       </Link>
       <div className="vacio vacio--error">
-        <span className="vacio__icono" aria-hidden="true">📼</span>
+        <span className="vacio__numero" aria-hidden="true">!</span>
         <p className="vacio__titulo">Se cortó la proyección</p>
         <p className="vacio__texto">{error?.message || error?.statusText || 'Ocurrió un error inesperado.'}</p>
         <div className="chips">

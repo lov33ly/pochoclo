@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { colorDe } from '../lib/color'
 
 export default function Avatar({ nombre = '?', foto, tamano = 36 }) {
   const [fallo, setFallo] = useState(false)
-  const c = colorDe(nombre)
   const iniciales = nombre
     .split(' ')
     .slice(0, 2)
@@ -22,11 +20,7 @@ export default function Avatar({ nombre = '?', foto, tamano = 36 }) {
       onError={() => setFallo(true)}
     />
   ) : (
-    <span
-      className="avatar avatar--iniciales"
-      style={{ width: tamano, height: tamano, background: c.fondo, color: c.texto, fontSize: tamano * 0.4 }}
-      aria-hidden="true"
-    >
+    <span className="avatar avatar--iniciales" style={{ width: tamano, height: tamano, fontSize: tamano * 0.4 }} aria-hidden="true">
       {iniciales}
     </span>
   )

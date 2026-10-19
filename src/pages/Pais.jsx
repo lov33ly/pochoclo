@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { tmdb, listar } from '../lib/tmdb'
-import { bandera, nombrePais } from '../lib/paises'
-import { estiloColor } from '../lib/color'
+import { nombrePais } from '../lib/paises'
+import TextoEscalado from '../components/TextoEscalado'
 import Poster from '../components/Poster'
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../components/Estados'
 
@@ -60,21 +60,21 @@ export default function Pais() {
   if (!valido)
     return (
       <div className="contenedor pagina">
-        <Vacio icono="🗺️" titulo="Ese país no está en el mapa" />
+        <Vacio titulo="Ese país no está en el mapa" />
       </div>
     )
 
   return (
     <div>
-      <header className="pais-cabecera" style={estiloColor(pais)}>
-        <div className="contenedor">
-          <Link to="/mundo" viewTransition className="volver">← Vuelta al mundo</Link>
-          <p className="pais-cabecera__bandera" aria-hidden="true">{bandera(pais)}</p>
-          <h1 className="titulo-pagina">Cine de {nombrePais(pais)}</h1>
-        </div>
+      <header className="contenedor portada">
+        <p className="rotulo">
+          <Link to="/mundo" viewTransition>← Vuelta al mundo</Link>
+        </p>
+        <TextoEscalado como="h1" proporcion={0.22} maximo={300}>{nombrePais(pais).toUpperCase()}</TextoEscalado>
+        <p className="portada__bajada">Películas y series producidas en {nombrePais(pais)}.</p>
       </header>
 
-      <div className="contenedor pagina">
+      <div className="contenedor pagina pagina--pegada">
         <div className="barra-filtros">
           <div className="chips" role="group" aria-label="Tipo">
             {[['movie', 'Películas'], ['tv', 'Series']].map(([v, e]) => (
@@ -102,7 +102,7 @@ export default function Pais() {
         ) : estado.error ? (
           <ErrorCarga error={estado.error} />
         ) : estado.items.length === 0 ? (
-          <Vacio icono="🎞️" titulo="No encontramos títulos con este filtro" />
+          <Vacio titulo="No encontramos títulos con este filtro" />
         ) : (
           <>
             <div className="grilla">

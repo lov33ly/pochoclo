@@ -28,3 +28,11 @@ export const hoy = () => {
 }
 
 export const estrellasTexto = (p) => '★'.repeat(Math.floor(p)) + (p % 1 ? '½' : '')
+
+// Duración en formato timecode de edición: 02:25:00
+export function timecode(min) {
+  if (!min) return '—'
+  const h = String(Math.floor(min / 60)).padStart(2, '0')
+  const m = String(min % 60).padStart(2, '0')
+  return `${h}:${m}:00`
+}

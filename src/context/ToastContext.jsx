@@ -36,7 +36,7 @@ export function ToastProvider({ children }) {
       <div className="toasts" role="status" aria-live="polite">
         {toasts.map((t) => (
           <button key={t.id} className={`toast toast--${t.tipo}`} onClick={() => cerrar(t.id)}>
-            <span className="toast__icono" aria-hidden="true">{t.tipo === 'error' ? '✕' : '🍿'}</span>
+            <span className="toast__icono" aria-hidden="true">{t.tipo === 'error' ? '✕' : '✓'}</span>
             {t.texto}
           </button>
         ))}

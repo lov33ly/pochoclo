@@ -47,7 +47,7 @@ export default function Estadisticas({ resenas }) {
     }
   }, [resenas])
 
-  if (!resenas.length) return <Vacio icono="📊" titulo="Sin datos para graficar todavía" />
+  if (!resenas.length) return <Vacio titulo="Sin datos para graficar todavía" />
 
   return (
     <div className="estadisticas">

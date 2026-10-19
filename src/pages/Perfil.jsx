@@ -8,7 +8,8 @@ import { useToast } from '../context/ToastContext'
 import { mes } from '../lib/formato'
 import Avatar from '../components/Avatar'
 import Poster from '../components/Poster'
-import Ticket from '../components/Ticket'
+import Resena from '../components/Resena'
+import TextoEscalado from '../components/TextoEscalado'
 import Pasaporte from '../components/Pasaporte'
 import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
@@ -116,7 +117,7 @@ export default function Perfil() {
   if (datos === null)
     return (
       <div className="contenedor pagina">
-        <Vacio icono="👻" titulo="Este perfil no existe" />
+        <Vacio titulo="Este perfil no existe" />
       </div>
     )
 
@@ -131,11 +132,16 @@ export default function Perfil() {
   return (
     <div className="perfil">
       <header className="perfil__cabecera">
-        <div className="contenedor perfil__interior">
-          <Avatar nombre={datos.nombre} foto={datos.foto} tamano={96} />
-          <div className="perfil__nombre">
-            <p className="sobretitulo">{propio ? 'Tu perfil' : 'Perfil'}</p>
-            <h1 className="titulo-pagina">{datos.nombre}</h1>
+        <div className="contenedor">
+          <p className="rotulo rotulo--doble">
+            <span>{propio ? 'Tu perfil' : 'Perfil'}</span>
+            <span>{mias.length} reseñas</span>
+          </p>
+          <TextoEscalado como="h1" proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))} maximo={280}>
+            {datos.nombre.toUpperCase()}
+          </TextoEscalado>
+          <div className="perfil__fila">
+            <Avatar nombre={datos.nombre} foto={datos.foto} tamano={64} />
             <Bio key={datos.bio} uid={uid} bio={datos.bio || ''} propio={propio} />
           </div>
           <dl className="cifras">
@@ -143,7 +149,7 @@ export default function Perfil() {
             <div><dt>Series</dt><dd>{cifras.series}</dd></div>
             <div><dt>Horas de cine</dt><dd>{cifras.horas}</dd></div>
             <div><dt>Países</dt><dd>{cifras.paises}</dd></div>
-            <div><dt>Promedio</dt><dd>{cifras.promedio}</dd></div>
+            <div><dt>Promedio</dt><dd>{String(cifras.promedio).replace('.', ',')}</dd></div>
           </dl>
         </div>
       </header>
@@ -164,21 +170,24 @@ export default function Perfil() {
 
         {pestana === 'diario' &&
           (diario.length === 0 ? (
-            <Vacio icono="🎟️" titulo={propio ? 'Tu diario está vacío' : 'Todavía no reseñó nada'}>
+            <Vacio titulo={propio ? 'Tu diario está vacío' : 'Todavía no reseñó nada'}>
               {propio && 'Buscá la última película que viste y dejale tu reseña.'}
             </Vacio>
           ) : (
             diario.map(([k, rs]) => (
               <section key={k} className="diario__mes">
-                <h2 className="diario__titulo">{mes(k + '-01')}</h2>
-                {rs.map((r) => <Ticket key={r.id} resena={r} variante="autor" />)}
+                <h2 className="diario__titulo">
+                  <span>{mes(k + '-01')}</span>
+                  <span>{rs.length}</span>
+                </h2>
+                {rs.map((r) => <Resena key={r.id} resena={{ ...r, autorNombre: null }} variante="autor" />)}
               </section>
             ))
           ))}
 
         {pestana === 'grilla' &&
           (mias.length === 0 ? (
-            <Vacio icono="🖼️" titulo="Sin pósters todavía" />
+            <Vacio titulo="Sin pósters todavía" />
           ) : (
             <div className="grilla">
               {mias.map((r) => (
@@ -197,7 +206,7 @@ export default function Perfil() {
         {pestana === 'quiero' &&
           propio &&
           (lista.length === 0 ? (
-            <Vacio icono="📌" titulo="Tu lista está vacía">Tocá “+ Quiero ver” en cualquier ficha para guardarla acá.</Vacio>
+            <Vacio titulo="Tu lista está vacía">Tocá “+ Quiero ver” en cualquier ficha para guardarla acá.</Vacio>
           ) : (
             <div className="grilla">
               {lista.map((q) => (

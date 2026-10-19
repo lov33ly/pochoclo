@@ -10,7 +10,7 @@ const PERMITIDAS = [
   /^trending\/(all|movie|tv)\/(day|week)$/,
   /^(movie|tv)\/(popular|top_rated|now_playing|on_the_air|airing_today)$/,
   /^(movie|tv)\/\d+$/,
-  /^(movie|tv)\/\d+\/(credits|recommendations|similar|watch\/providers)$/,
+  /^(movie|tv)\/\d+\/(credits|recommendations|similar|reviews|watch\/providers)$/,
   /^discover\/(movie|tv)$/,
   /^search\/(multi|movie|tv)$/,
   /^genre\/(movie|tv)\/list$/,

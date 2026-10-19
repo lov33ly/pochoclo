@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { tmdb, listar, imagen } from '../lib/tmdb'
 import { TODOS_LOS_PAISES } from '../lib/mundo'
-import { bandera, nombrePais } from '../lib/paises'
+import { nombrePais } from '../lib/paises'
 import { TIPOS } from '../lib/formato'
 
 const ALTO = 240 // alto de cada póster en el rodillo (px)
@@ -71,8 +71,8 @@ function Maquina({ onCerrar }) {
     <div className="ruleta">
       <header className="editor__cabecera">
         <div>
-          <p className="sobretitulo">No sé qué ver</p>
-          <h2 className="editor__titulo">La ruleta del pochoclo</h2>
+          <p className="rotulo">No sé qué ver</p>
+          <h2 className="editor__titulo">RULETA</h2>
         </div>
         <button type="button" className="cerrar" onClick={onCerrar} aria-label="Cerrar">✕</button>
       </header>
@@ -96,7 +96,7 @@ function Maquina({ onCerrar }) {
           <span className="etiqueta">País</span>
           <select value={pais} onChange={(e) => setPais(e.target.value)} disabled={girando}>
             <option value="">Cualquiera</option>
-            {TODOS_LOS_PAISES.map((p) => <option key={p} value={p}>{bandera(p)} {nombrePais(p)}</option>)}
+            {TODOS_LOS_PAISES.map((p) => <option key={p} value={p}>{nombrePais(p)}</option>)}
           </select>
         </label>
       </div>
@@ -132,7 +132,7 @@ function Maquina({ onCerrar }) {
         </div>
       ) : (
         <button className="boton boton--primario boton--grande ruleta__girar" onClick={girar} disabled={girando}>
-          {girando ? 'Girando…' : '🎰 ¡Girar!'}
+          {girando ? 'Girando…' : 'Girar'}
         </button>
       )}
     </div>

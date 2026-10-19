@@ -5,11 +5,12 @@ import { configCompleta } from '../firebase'
 import Logo from './Logo'
 import Avatar from './Avatar'
 import Ruleta from './Ruleta'
+import TextoEscalado from './TextoEscalado'
 
 const SECCIONES = [
-  { to: '/', etiqueta: 'Inicio', icono: '🏠', end: true },
-  { to: '/buscar', etiqueta: 'Buscar', icono: '🔎' },
-  { to: '/mundo', etiqueta: 'Mundo', icono: '🌎' },
+  { to: '/', etiqueta: 'Inicio', end: true },
+  { to: '/buscar', etiqueta: 'Buscar' },
+  { to: '/mundo', etiqueta: 'Mundo' },
 ]
 
 export default function Layout() {
@@ -32,8 +33,8 @@ export default function Layout() {
 
       <header className="nav">
         <Link to="/" viewTransition className="nav__marca" aria-label="Pochoclo, inicio">
-          <Logo />
-          <span>pochoclo</span>
+          <Logo tamano={22} />
+          <span>Pochoclo</span>
         </Link>
 
         <nav className="nav__links" aria-label="Principal">
@@ -42,8 +43,8 @@ export default function Layout() {
               {s.etiqueta}
             </NavLink>
           ))}
-          <button className="nav__link nav__ruleta" onClick={() => setRuleta(true)}>
-            🎰 Ruleta
+          <button className="nav__link" onClick={() => setRuleta(true)}>
+            Ruleta
           </button>
         </nav>
 
@@ -52,7 +53,7 @@ export default function Layout() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar entre un millón de títulos"
+            placeholder="Buscar película o serie"
             aria-label="Buscar películas y series"
           />
         </form>
@@ -60,8 +61,8 @@ export default function Layout() {
         <div className="nav__usuario">
           {!listo ? null : usuario ? (
             <div className="menu">
-              <button className="menu__boton" onClick={() => setMenu((m) => !m)} aria-expanded={menu}>
-                <Avatar nombre={usuario.displayName || '?'} foto={usuario.photoURL} tamano={34} />
+              <button className="menu__boton" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label="Menú de usuario">
+                <Avatar nombre={usuario.displayName || '?'} foto={usuario.photoURL} tamano={32} />
               </button>
               {menu && (
                 <div className="menu__lista" onClick={() => setMenu(false)}>
@@ -71,16 +72,16 @@ export default function Layout() {
               )}
             </div>
           ) : (
-            <button className="boton boton--chico" onClick={() => entrar().catch(() => {})} disabled={!configCompleta}>
-              Entrar con Google
+            <button className="boton boton--chico" onClick={() => entrar()} disabled={!configCompleta}>
+              Entrar
             </button>
           )}
         </div>
       </header>
 
       {!configCompleta && (
-        <p className="aviso aviso--error contenedor">
-          Faltan las variables de entorno de Firebase: copiá <code>.env.example</code> como <code>.env</code> y completalo.
+        <p className="aviso aviso--error aviso--barra">
+          Faltan las variables de entorno de Firebase: las reseñas y los perfiles no van a funcionar.
         </p>
       )}
 
@@ -89,15 +90,34 @@ export default function Layout() {
       </main>
 
       <footer className="pie">
-        <div className="contenedor pie__interior">
-          <p className="pie__marca">
-            <Logo tamano={28} /> pochoclo
-          </p>
-          <p>Reseñas de cine y series de todo el mundo. TP2 · Desarrollo Frontend II.</p>
-          <p className="pie__tmdb">
-            Datos e imágenes de{' '}
-            <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer">TMDB</a>. Este producto usa la API de
-            TMDB pero no está avalado ni certificado por TMDB.
+        <div className="contenedor">
+          <TextoEscalado proporcion={0.24} maximo={320} className="pie__marca">POCHOCLO</TextoEscalado>
+          <div className="pie__grilla">
+            <p className="pie__lema">Todas las películas y series del mundo, reseñadas por la gente que las ve.</p>
+            <nav className="pie__columna" aria-label="Explorar">
+              <span className="pie__titulo">Explorar</span>
+              <Link to="/" viewTransition>Inicio</Link>
+              <Link to="/buscar" viewTransition>Buscar</Link>
+              <Link to="/mundo" viewTransition>Vuelta al mundo</Link>
+              <button onClick={() => setRuleta(true)}>Ruleta</button>
+            </nav>
+            <div className="pie__columna">
+              <span className="pie__titulo">Contacto</span>
+              <a href="mailto:hola@pochoclo.club">hola@pochoclo.club</a>
+              <a href="mailto:prensa@pochoclo.club">prensa@pochoclo.club</a>
+            </div>
+            <div className="pie__columna">
+              <span className="pie__titulo">Seguinos</span>
+              <span>Instagram — @pochoclo.cine</span>
+              <span>Letterboxd — pochoclo</span>
+            </div>
+          </div>
+          <p className="pie__legal">
+            <span>© 2026 Pochoclo</span>
+            <span>
+              Imágenes y datos de{' '}
+              <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer">TMDB</a>
+            </span>
           </p>
         </div>
       </footer>
@@ -106,22 +126,18 @@ export default function Layout() {
       <nav className="tabbar" aria-label="Navegación móvil">
         {SECCIONES.map((s) => (
           <NavLink key={s.to} to={s.to} end={s.end} viewTransition className="tabbar__item">
-            <span aria-hidden="true">{s.icono}</span>
             {s.etiqueta}
           </NavLink>
         ))}
         <button className="tabbar__item" onClick={() => setRuleta(true)}>
-          <span aria-hidden="true">🎰</span>
           Ruleta
         </button>
         {usuario ? (
           <NavLink to={`/u/${usuario.uid}`} viewTransition className="tabbar__item">
-            <Avatar nombre={usuario.displayName || '?'} foto={usuario.photoURL} tamano={22} />
             Perfil
           </NavLink>
         ) : (
-          <button className="tabbar__item" onClick={() => entrar().catch(() => {})} disabled={!configCompleta}>
-            <span aria-hidden="true">👤</span>
+          <button className="tabbar__item" onClick={() => entrar()} disabled={!configCompleta}>
             Entrar
           </button>
         )}

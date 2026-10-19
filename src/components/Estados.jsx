@@ -1,4 +1,4 @@
-// Estados de carga, vacío y error con guiños de cine.
+// Estados de carga, vacío y error.
 
 // "Cola de proyección": la cuenta regresiva que aparecía al principio de los rollos de película.
 export function Cargador({ texto = 'Cargando' }) {
@@ -43,12 +43,14 @@ export function SkeletonGrilla({ cantidad = 12 }) {
   )
 }
 
-export function Vacio({ icono = '🎞️', titulo, children }) {
+export function Vacio({ numero = '0', titulo, children }) {
   return (
     <div className="vacio">
-      <span className="vacio__icono" aria-hidden="true">{icono}</span>
-      <p className="vacio__titulo">{titulo}</p>
-      {children && <div className="vacio__texto">{children}</div>}
+      <span className="vacio__numero" aria-hidden="true">{numero}</span>
+      <div>
+        <p className="vacio__titulo">{titulo}</p>
+        {children && <div className="vacio__texto">{children}</div>}
+      </div>
     </div>
   )
 }
@@ -56,12 +58,14 @@ export function Vacio({ icono = '🎞️', titulo, children }) {
 export function ErrorCarga({ error, onReintentar }) {
   return (
     <div className="vacio vacio--error">
-      <span className="vacio__icono" aria-hidden="true">📼</span>
-      <p className="vacio__titulo">Se cortó la proyección</p>
-      <p className="vacio__texto">{error?.message || 'Ocurrió un error inesperado.'}</p>
-      {onReintentar && (
-        <button className="boton" onClick={onReintentar}>Reintentar</button>
-      )}
+      <span className="vacio__numero" aria-hidden="true">!</span>
+      <div>
+        <p className="vacio__titulo">Se cortó la proyección</p>
+        <div className="vacio__texto">
+          <p>{error?.message || 'Ocurrió un error inesperado.'}</p>
+          {onReintentar && <button className="boton" onClick={onReintentar}>Reintentar</button>}
+        </div>
+      </div>
     </div>
   )
 }
