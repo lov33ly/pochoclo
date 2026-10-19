@@ -821,6 +821,8 @@ textarea[aria-invalid='true'] { border-color: var(--rojo); }
 .resena__revelar { position: absolute; inset: 0; margin: auto; width: fit-content; height: fit-content; padding: 6px 12px; border: var(--filete-grueso); background: var(--blanco); font-family: var(--display); font-weight: 700; font-size: 12px; text-transform: uppercase; }
 .resena__pie { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--display); font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--gris-3); }
 .resena__pie .enlace { color: var(--negro); font-size: 11px; }
+.resena__por { color: var(--negro); text-decoration: none; }
+.resena__por:hover { text-decoration: underline; }
 .resena__origen { padding: 1px 6px; border: 1px solid var(--gris-3); color: var(--gris-3); text-decoration: none; }
 a.resena__origen:hover { background: var(--negro); border-color: var(--negro); color: var(--blanco); }
 .resena__mas { margin-top: 6px; font-size: 13px; }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { imagen } from '../lib/tmdb'
-import { fecha, TIPOS } from '../lib/formato'
+import { fecha } from '../lib/formato'
 import { EstrellasFijas } from './Estrellas'
 import Avatar from './Avatar'
 import { usePerfilPublico } from '../hooks/usePerfilPublico'
@@ -18,8 +18,10 @@ export default function Resena({ resena, variante = 'titulo', propia, mostrarSpo
   const origen = resena.origen || 'pochoclo'
   const { vistas } = useAuth()
   const vista = vistas.has(`${resena.tipo}_${resena.tmdbId}`)
-  // Para reseñas de Pochoclo se muestran el nombre y la foto actuales del perfil.
-  const perfil = usePerfilPublico(origen === 'pochoclo' && variante === 'titulo' ? resena.uid : null)
+  // Para reseñas de Pochoclo se muestran el nombre y la foto actuales del perfil,
+  // así un cambio de nombre se ve también en las reseñas viejas.
+  const mostrarAutor = resena.autorNombre !== null
+  const perfil = usePerfilPublico(origen === 'pochoclo' && mostrarAutor ? resena.uid : null)
   const nombre = perfil?.nombre || resena.autorNombre
   const foto = perfil ? perfil.foto : resena.autorFoto
   const oculto = resena.spoiler && !revelar && !propia && !mostrarSpoiler
@@ -78,11 +80,10 @@ export default function Resena({ resena, variante = 'titulo', propia, mostrarSpo
         )}
 
         <footer className="resena__pie">
-          {variante === 'autor' && (
-            <span>
-              {TIPOS[resena.tipo]} · {resena.anio || '—'}
-              {resena.autorNombre && ` · ${resena.autorNombre}`}
-            </span>
+          {variante === 'autor' && mostrarAutor && (
+            <Link to={`/u/${resena.uid}`} viewTransition className="resena__por">
+              {nombre}
+            </Link>
           )}
           {resena.vista && <span>{origen === 'tmdb' ? 'Publicada el' : 'Vista el'} {fecha(resena.vista)}</span>}
           {origen === 'tmdb' && (
