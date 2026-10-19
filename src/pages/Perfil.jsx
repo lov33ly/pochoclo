@@ -73,7 +73,6 @@ export default function Perfil() {
         titulo={datos.nombre}
         proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))}
         maximo={300}
-        vertical="Diario de cine"
       >
         <div className="perfil__fila">
           <Avatar nombre={datos.nombre} foto={datos.foto} tamano={96} />
