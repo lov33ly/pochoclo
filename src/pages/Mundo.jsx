@@ -1,22 +1,27 @@
 import { Link } from 'react-router'
 import { REGIONES } from '../lib/mundo'
 import { nombrePais } from '../lib/paises'
-import TextoEscalado from '../components/TextoEscalado'
+import PortadaColor from '../components/PortadaColor'
 import Seccion from '../components/Seccion'
-import Circulos from '../components/Circulos'
 
 export default function Mundo() {
   return (
-    <div className="contenedor pagina">
-      <header className="portada portada--circulos">
-        <Circulos colores={['#EE3524']} semilla={7} cantidad={4} />
-        <p className="rotulo">Vuelta al mundo</p>
-        <TextoEscalado como="h1" proporcion={0.3} maximo={360}>MUNDO</TextoEscalado>
-        <p className="portada__bajada">
-          El cine no habla un solo idioma. Elegí un país y descubrí sus películas y series: lo más visto, lo mejor
-          puntuado y lo último que se estrenó.
+    <>
+      <PortadaColor
+        color="rojo"
+        rotulo="Vuelta al mundo"
+        rotuloDerecha="Cine de 50 países"
+        titulo="MUNDO"
+        proporcion={0.34}
+        maximo={460}
+        vertical="El cine no habla un solo idioma"
+        contorno="CINE"
+      >
+        <p className="portada-color__bajada">
+          Elegí un país y descubrí sus películas y series: lo más visto, lo mejor puntuado y lo último que se estrenó.
         </p>
-      </header>
+      </PortadaColor>
+      <div className="contenedor pagina">
 
       {REGIONES.map((r) => (
         <Seccion key={r.nombre} titulo={r.nombre}>
@@ -32,6 +37,7 @@ export default function Mundo() {
           </ul>
         </Seccion>
       ))}
-    </div>
+      </div>
+    </>
   )
 }

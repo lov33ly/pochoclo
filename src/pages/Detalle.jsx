@@ -11,26 +11,14 @@ import { escucharResenasDeTitulo, idResena } from '../services/resenas'
 import { escucharQuieroVer, agregarQuieroVer, quitarQuieroVer } from '../services/quieroVer'
 import { Cargador, ErrorCarga } from '../components/Estados'
 import { EstrellasFijas } from '../components/Estrellas'
-import TextoEscalado from '../components/TextoEscalado'
 import Seccion from '../components/Seccion'
 import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
 import ResenaForm from '../components/ResenaForm'
-import Circulos from '../components/Circulos'
+import PortadaColor from '../components/PortadaColor'
+import Marquesina from '../components/Marquesina'
 import Cinta from '../components/Cinta'
 import { resenasTmdb, resenasEjemplo } from '../lib/resenasExtra'
-
-// De la paleta del fotograma se eligen los colores con más vida (ni muy oscuros ni grises)
-// para los círculos de la portada; si no hay, se usan el rojo y el azul de la marca.
-function coloresVivos(paleta) {
-  const vivos = (paleta || []).filter((c) => {
-    const [r, g, b] = c.rgb.split(',').map((n) => Number(n) / 255)
-    const max = Math.max(r, g, b)
-    const min = Math.min(r, g, b)
-    return max > 0.35 && max - min > 0.18
-  })
-  return vivos.length >= 2 ? vivos.slice(0, 3).map((c) => c.hex) : ['#EE3524', '#2442D6', '#4A90E6']
-}
 
 // Cuanto más corto el título, más alto el titular (siempre ocupa todo el ancho).
 const proporcionTitulo = (t) => Math.min(0.34, Math.max(0.13, 3.4 / t.length))
@@ -106,70 +94,77 @@ export default function Detalle() {
   if (cargando) return <Cargador texto="Preparando la función" />
   if (error) return <div className="contenedor pagina"><ErrorCarga error={error} /></div>
 
-  const largo = t.titulo.length > 34
 
   return (
     <article className="ficha">
-      {/* ---------- Portada ---------- */}
-      <header className="contenedor ficha__portada">
-        <Circulos colores={coloresVivos(paleta)} semilla={t.id} cantidad={3} className="ficha__circulos" />
-        <p className="rotulo">
-          {TIPOS[t.tipo]} · {t.anio || 'S/F'}
-        </p>
-        {largo ? (
-          <h1 className="titular-largo">{t.titulo}</h1>
-        ) : (
-          <TextoEscalado como="h1" proporcion={proporcionTitulo(t.titulo)} maximo={340}>
-            {t.titulo.toUpperCase()}
-          </TextoEscalado>
-        )}
-        {t.tituloOriginal && t.tituloOriginal !== t.titulo && (
-          <p className="ficha__original">
-            Título original: <em>{t.tituloOriginal}</em>
-          </p>
-        )}
-      </header>
-
-      <div className="contenedor ficha__visual">
-        <figure className="ficha__poster-fig">
-          {t.poster ? (
-            <img
-              key={t.id}
-              className="ficha__poster"
-              src={imagen(t.poster, 'w500')}
-              alt={`Póster de ${t.titulo}`}
-              style={{ viewTransitionName: 'poster-activo' }}
-              data-vt-activo=""
-            />
-          ) : (
-            <div className="ficha__poster ficha__poster--vacio">{t.titulo}</div>
-          )}
-          <Cinta arriba={-12} izquierda="-6%" giro={-32} ancho={96} />
-          <Cinta abajo={-10} derecha="-8%" giro={-28} ancho={90} />
-        </figure>
-        {t.fondo && (
-          <figure className="ficha__fotograma">
-            <img src={imagen(t.fondo, 'w1280')} alt={`Fotograma de ${t.titulo}`} />
+      {/* ---------- Portada: afiche azul con el fotograma en duotono ---------- */}
+      <PortadaColor
+        color="azul"
+        fondo={t.fondo ? imagen(t.fondo, 'w1280') : null}
+        rotulo={`${TIPOS[t.tipo]} · ${t.anio || 'S/F'}`}
+        rotuloDerecha={t.paises.length ? nombrePais(t.paises[0]) : null}
+        titulo={t.titulo}
+        proporcion={proporcionTitulo(t.titulo)}
+        maximo={360}
+        vertical={t.tituloOriginal}
+      >
+        <div className="ficha__cabecera">
+          <figure className="ficha__poster-fig">
+            {t.poster ? (
+              <img
+                key={t.id}
+                className="ficha__poster"
+                src={imagen(t.poster, 'w500')}
+                alt={`Póster de ${t.titulo}`}
+                style={{ viewTransitionName: 'poster-activo' }}
+                data-vt-activo=""
+              />
+            ) : (
+              <div className="ficha__poster ficha__poster--vacio">{t.titulo}</div>
+            )}
+            <Cinta arriba={-12} izquierda="-10%" giro={-32} ancho={90} />
+            <Cinta abajo={-8} derecha="-12%" giro={-28} ancho={84} />
           </figure>
-        )}
-      </div>
+          <div className="ficha__datos-portada">
+            {t.tituloOriginal && t.tituloOriginal !== t.titulo && (
+              <p className="ficha__original">“{t.tituloOriginal}”</p>
+            )}
+            {t.direccion.length > 0 && (
+              <p className="ficha__direccion">
+                {t.tipo === 'movie' ? 'Dirigida por' : 'Creada por'} <strong>{t.direccion.slice(0, 2).join(' y ')}</strong>
+              </p>
+            )}
+            <div className="ficha__acciones">
+              <a href="#resenas" className="boton boton--rojo">{mia ? 'Ver mi reseña' : 'Reseñar'} ↓</a>
+              <button
+                className={`boton boton--contorno ${enLista ? 'activo' : ''}`}
+                onClick={alternarLista}
+                aria-pressed={enLista}
+                disabled={!!mia}
+                title={mia ? 'Ya la reseñaste' : undefined}
+              >
+                {mia ? '✓ Vista' : enLista ? '✓ En Quiero ver' : '+ Quiero ver'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </PortadaColor>
+
+      <Marquesina
+        items={[
+          t.titulo,
+          t.direccion[0],
+          t.anio,
+          ...t.paises.slice(0, 2).map(nombrePais),
+          ...t.generos.slice(0, 3),
+          t.duracion ? timecode(t.duracion) : null,
+        ]}
+      />
 
       <div className="contenedor ficha__columnas">
         <Seccion titulo="Sinopsis">
           {t.lema && <p className="ficha__lema">“{t.lema}”</p>}
           <p className="ficha__resumen">{t.resumen || 'Todavía no hay sinopsis en español para este título.'}</p>
-          <div className="ficha__acciones">
-            <a href="#resenas" className="boton boton--negro">{mia ? 'Ver mi reseña' : 'Reseñar'} ↓</a>
-            <button
-              className={`boton ${enLista ? 'boton--negro' : ''}`}
-              onClick={alternarLista}
-              aria-pressed={enLista}
-              disabled={!!mia}
-              title={mia ? 'Ya la reseñaste' : undefined}
-            >
-              {mia ? '✓ Vista' : enLista ? '✓ En Quiero ver' : '+ Quiero ver'}
-            </button>
-          </div>
         </Seccion>
 
         <Seccion titulo="Ficha técnica">

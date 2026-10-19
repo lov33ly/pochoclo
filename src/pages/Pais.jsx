@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { tmdb, listar } from '../lib/tmdb'
+import { tmdb, listar, imagen } from '../lib/tmdb'
 import { nombrePais } from '../lib/paises'
-import TextoEscalado from '../components/TextoEscalado'
+import PortadaColor from '../components/PortadaColor'
 import Poster from '../components/Poster'
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../components/Estados'
 
@@ -66,15 +66,18 @@ export default function Pais() {
 
   return (
     <div>
-      <header className="contenedor portada">
-        <p className="rotulo">
-          <Link to="/mundo" viewTransition>← Vuelta al mundo</Link>
-        </p>
-        <TextoEscalado como="h1" proporcion={0.22} maximo={300}>{nombrePais(pais).toUpperCase()}</TextoEscalado>
-        <p className="portada__bajada">Películas y series producidas en {nombrePais(pais)}.</p>
-      </header>
+      <PortadaColor
+        color="rojo"
+        fondo={estado.clave === clave && estado.items.find((t) => t.fondo) ? imagen(estado.items.find((t) => t.fondo).fondo, 'w1280') : null}
+        rotulo={<Link to="/mundo" viewTransition>← Vuelta al mundo</Link>}
+        rotuloDerecha={`Cine de ${nombrePais(pais)}`}
+        titulo={nombrePais(pais)}
+        proporcion={0.24}
+        maximo={340}
+        vertical={pais}
+      />
 
-      <div className="contenedor pagina pagina--pegada">
+      <div className="contenedor pagina">
         <div className="barra-filtros">
           <div className="chips" role="group" aria-label="Tipo">
             {[['movie', 'Películas'], ['tv', 'Series']].map(([v, e]) => (

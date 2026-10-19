@@ -43,7 +43,7 @@ export function SkeletonGrilla({ cantidad = 12 }) {
   )
 }
 
-export function Vacio({ numero = '0', titulo, children }) {
+export function Vacio({ numero = '?', titulo, children }) {
   return (
     <div className="vacio">
       <span className="vacio__numero" aria-hidden="true">{numero}</span>

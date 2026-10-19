@@ -9,8 +9,7 @@ import { mes } from '../lib/formato'
 import Avatar from '../components/Avatar'
 import Poster from '../components/Poster'
 import Resena from '../components/Resena'
-import TextoEscalado from '../components/TextoEscalado'
-import Circulos from '../components/Circulos'
+import PortadaColor from '../components/PortadaColor'
 import Pasaporte from '../components/Pasaporte'
 import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
@@ -132,29 +131,27 @@ export default function Perfil() {
 
   return (
     <div className="perfil">
-      <header className="perfil__cabecera">
-        <div className="contenedor perfil__interior">
-          <Circulos colores={['#2442D6', '#4A90E6']} semilla={uid.length * 97} cantidad={4} modo="screen" className="perfil__circulos" />
-          <p className="rotulo rotulo--doble">
-            <span>{propio ? 'Tu perfil' : 'Perfil'}</span>
-            <span>{mias.length} reseñas</span>
-          </p>
-          <TextoEscalado como="h1" proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))} maximo={280}>
-            {datos.nombre.toUpperCase()}
-          </TextoEscalado>
-          <div className="perfil__fila">
-            <Avatar nombre={datos.nombre} foto={datos.foto} tamano={64} />
-            <Bio key={datos.bio} uid={uid} bio={datos.bio || ''} propio={propio} />
-          </div>
-          <dl className="cifras">
-            <div><dt>Películas</dt><dd>{cifras.pelis}</dd></div>
-            <div><dt>Series</dt><dd>{cifras.series}</dd></div>
-            <div><dt>Horas de cine</dt><dd>{cifras.horas}</dd></div>
-            <div><dt>Países</dt><dd>{cifras.paises}</dd></div>
-            <div><dt>Promedio</dt><dd>{String(cifras.promedio).replace('.', ',')}</dd></div>
-          </dl>
+      <PortadaColor
+        color="negro"
+        rotulo={propio ? 'Tu perfil' : 'Perfil'}
+        rotuloDerecha={`${mias.length} reseñas`}
+        titulo={datos.nombre}
+        proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))}
+        maximo={300}
+        vertical="Diario de cine"
+      >
+        <div className="perfil__fila">
+          <Avatar nombre={datos.nombre} foto={datos.foto} tamano={72} />
+          <Bio key={datos.bio} uid={uid} bio={datos.bio || ''} propio={propio} />
         </div>
-      </header>
+        <dl className="cifras">
+          <div><dt>Películas</dt><dd>{cifras.pelis}</dd></div>
+          <div><dt>Series</dt><dd>{cifras.series}</dd></div>
+          <div><dt>Horas de cine</dt><dd>{cifras.horas}</dd></div>
+          <div><dt>Países</dt><dd>{cifras.paises}</dd></div>
+          <div><dt>Promedio</dt><dd>{String(cifras.promedio).replace('.', ',')}</dd></div>
+        </dl>
+      </PortadaColor>
 
       <div className="contenedor pagina">
         <nav className="pestanas" aria-label="Secciones del perfil">

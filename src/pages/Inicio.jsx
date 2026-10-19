@@ -12,6 +12,7 @@ import Resena from '../components/Resena'
 import Seccion from '../components/Seccion'
 import TextoEscalado from '../components/TextoEscalado'
 import Cinta from '../components/Cinta'
+import Marquesina from '../components/Marquesina'
 
 function useLista(ruta, params, tipo) {
   return useAsync(() => tmdb(ruta, params).then((d) => listar(d, tipo)), [ruta, params, tipo])
@@ -145,11 +146,19 @@ export default function Inicio() {
   return (
     <>
       <Portada items={tendencias.datos || []} abrirRuleta={abrirRuleta} />
+      <Marquesina items={['Reseñas', 'Cine', 'Series', 'Todo el mundo', 'Tu diario', 'Tu pasaporte', 'Puntajes', 'Ruleta']} />
       <div className="contenedor pagina">
         <Carrusel titulo="Tendencias" bajada="Lo más visto esta semana" mostrarTipo {...props(tendencias)} />
         <Carrusel titulo="Películas populares" {...props(pelis)} />
         <Actividad />
         <Carrusel titulo="Series en tendencia" {...props(series)} />
+      </div>
+      <Marquesina
+        color="negro"
+        invertida
+        items={(tendencias.datos || []).slice(0, 10).map((t) => t.titulo)}
+      />
+      <div className="contenedor pagina pagina--pegada">
         <VueltaAlMundo />
         <Carrusel titulo="Joyas fuera de Hollywood" bajada="Mejor puntuadas, no habladas en inglés" {...props(joyas)} />
       </div>

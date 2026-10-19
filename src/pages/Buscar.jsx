@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { tmdb, listar } from '../lib/tmdb'
 import Poster from '../components/Poster'
-import TextoEscalado from '../components/TextoEscalado'
-import Circulos from '../components/Circulos'
+import PortadaColor from '../components/PortadaColor'
 import { SkeletonGrilla, Vacio, ErrorCarga } from '../components/Estados'
 
 const FILTROS = [
@@ -57,36 +56,42 @@ export default function Buscar() {
   const items = estado.items.filter((t, i, arr) => arr.findIndex((x) => x.tipo === t.tipo && x.id === t.id) === i)
 
   return (
-    <div className="contenedor pagina">
-      <header className="portada portada--circulos">
-        <Circulos colores={['#2442D6', '#4A90E6']} semilla={3} cantidad={2} />
-        <p className="rotulo">Buscador</p>
-        <TextoEscalado como="h1" proporcion={0.24} maximo={300}>¿QUÉ VISTE?</TextoEscalado>
-      </header>
-
-      <div className="buscador">
-        <input
-          className="buscador__input"
-          type="search"
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          placeholder="Parasite, La casa de papel, Relatos salvajes…"
-          aria-label="Buscar"
-          autoFocus
-        />
-        <div className="chips" role="group" aria-label="Tipo">
-          {FILTROS.map((f) => (
-            <button
-              key={f.valor}
-              className={`chip ${filtro === f.valor ? 'chip--activo' : ''}`}
-              aria-pressed={filtro === f.valor}
-              onClick={() => setParams(q ? { q, tipo: f.valor } : { tipo: f.valor }, { replace: true })}
-            >
-              {f.etiqueta}
-            </button>
-          ))}
+    <>
+      <PortadaColor
+        color="negro"
+        rotulo="Buscador"
+        rotuloDerecha="Más de un millón de títulos"
+        titulo="¿QUÉ VISTE?"
+        proporcion={0.24}
+        maximo={340}
+        vertical="Películas · Series · Todo el mundo"
+      >
+        <div className="buscador">
+          <input
+            className="buscador__input"
+            type="search"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            placeholder="Parasite, La casa de papel, Relatos salvajes…"
+            aria-label="Buscar"
+            autoFocus
+          />
+          <div className="chips" role="group" aria-label="Tipo">
+            {FILTROS.map((f) => (
+              <button
+                key={f.valor}
+                className={`chip ${filtro === f.valor ? 'chip--activo' : ''}`}
+                aria-pressed={filtro === f.valor}
+                onClick={() => setParams(q ? { q, tipo: f.valor } : { tipo: f.valor }, { replace: true })}
+              >
+                {f.etiqueta}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </PortadaColor>
+      <div className="contenedor pagina">
+
 
       {!q ? (
         <Vacio titulo="Buscá cualquier película o serie del mundo">
@@ -114,6 +119,7 @@ export default function Buscar() {
           )}
         </>
       )}
-    </div>
+      </div>
+    </>
   )
 }
