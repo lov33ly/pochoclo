@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
 import { auth, proveedorGoogle } from '../firebase'
-import { asegurarPerfil } from '../services/usuarios'
+import { asegurarPerfil, escucharPerfil } from '../services/usuarios'
 import { useToast } from './ToastContext'
 
 // Traduce los errores más comunes del inicio de sesión a mensajes entendibles.
@@ -19,6 +19,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null)
   const [listo, setListo] = useState(!auth)
+  const [perfil, setPerfil] = useState(null)
   const { avisar } = useToast()
 
   useEffect(() => {
@@ -30,6 +31,12 @@ export function AuthProvider({ children }) {
     })
   }, [])
 
+  // Perfil propio en vivo (nombre, foto y bio editables desde la página de perfil).
+  useEffect(() => {
+    if (!usuario) return
+    return escucharPerfil(usuario.uid, setPerfil, () => {})
+  }, [usuario])
+
   const entrar = () =>
     signInWithPopup(auth, proveedorGoogle)
       .then((r) => avisar(`¡Hola, ${r.user.displayName?.split(' ')[0] || 'cinéfilo'}!`))
@@ -39,7 +46,7 @@ export function AuthProvider({ children }) {
       })
   const salir = () => signOut(auth)
 
-  return <AuthContext.Provider value={{ usuario, listo, entrar, salir }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ usuario, perfil: usuario ? perfil : null, listo, entrar, salir }}>{children}</AuthContext.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

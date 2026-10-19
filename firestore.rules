@@ -23,10 +23,19 @@ service cloud.firestore {
     }
 
     // ---------- Perfiles ----------
+    // La foto puede ser la URL de Google o una imagen subida desde la app,
+    // comprimida a 320×320 y guardada como data URL (máximo ~200 KB).
+    function fotoValida(foto) {
+      return foto is string && foto.size() <= 200000
+        && (foto.size() == 0
+            || foto.matches('^https://.*')
+            || foto.matches('^data:image/(jpeg|png|webp);base64,.*'));
+    }
+
     function perfilValido(d) {
       return d.keys().hasOnly(['nombre', 'foto', 'bio', 'creado'])
-        && textoHasta(d.nombre, 80) && d.nombre.size() > 0
-        && textoHasta(d.foto, 500)
+        && d.nombre is string && d.nombre.size() >= 2 && d.nombre.size() <= 40
+        && fotoValida(d.foto)
         && textoHasta(d.bio, 160);
     }
 

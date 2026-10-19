@@ -61,8 +61,8 @@ export function guardarResena(usuario, titulo, datos, existente) {
   return setDoc(ref, {
     ...contenido,
     uid: usuario.uid,
-    autorNombre: usuario.displayName || 'Cinéfilo anónimo',
-    autorFoto: usuario.photoURL || '',
+    autorNombre: (usuario.nombre || usuario.displayName || 'Cinéfilo anónimo').slice(0, 80),
+    autorFoto: (usuario.photoURL || '').startsWith('https://') ? usuario.photoURL.slice(0, 500) : '',
     clave: `${titulo.tipo}_${titulo.id}`,
     tipo: titulo.tipo,
     tmdbId: titulo.id,

@@ -4,24 +4,29 @@ import { imagen } from '../lib/tmdb'
 import { fecha, TIPOS } from '../lib/formato'
 import { EstrellasFijas } from './Estrellas'
 import Avatar from './Avatar'
+import { usePerfilPublico } from '../hooks/usePerfilPublico'
 
 const LARGO_MAXIMO = 420
 
 // Una reseña como fila tipográfica: puntaje en grande, autor/título, texto y fecha.
 // variante "titulo" (en la ficha: se ve quién reseñó) o "autor" (en perfil e inicio: se ve qué película).
 // origen: "pochoclo" (Firestore), "tmdb" (reseña real de TMDB) o "ejemplo" (inventada).
-export default function Resena({ resena, variante = 'titulo', propia, onEditar }) {
+export default function Resena({ resena, variante = 'titulo', propia, mostrarSpoiler, onEditar }) {
   const [revelar, setRevelar] = useState(false)
   const [completa, setCompleta] = useState(false)
   const origen = resena.origen || 'pochoclo'
-  const oculto = resena.spoiler && !revelar && !propia
+  // Para reseñas de Pochoclo se muestran el nombre y la foto actuales del perfil.
+  const perfil = usePerfilPublico(origen === 'pochoclo' && variante === 'titulo' ? resena.uid : null)
+  const nombre = perfil?.nombre || resena.autorNombre
+  const foto = perfil ? perfil.foto : resena.autorFoto
+  const oculto = resena.spoiler && !revelar && !propia && !mostrarSpoiler
   const largo = (resena.texto || '').length > LARGO_MAXIMO
   const texto = largo && !completa ? resena.texto.slice(0, LARGO_MAXIMO).trimEnd() + '…' : resena.texto
 
   const autor = (
     <>
-      <Avatar nombre={resena.autorNombre || '?'} foto={resena.autorFoto} tamano={24} />
-      <span>{resena.autorNombre}</span>
+      <Avatar nombre={nombre || '?'} foto={foto} tamano={24} />
+      <span>{nombre}</span>
       {propia && <em>(vos)</em>}
     </>
   )

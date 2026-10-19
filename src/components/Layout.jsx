@@ -14,7 +14,9 @@ const SECCIONES = [
 ]
 
 export default function Layout() {
-  const { usuario, listo, entrar, salir } = useAuth()
+  const { usuario, perfil, listo, entrar, salir } = useAuth()
+  const nombre = perfil?.nombre || usuario?.displayName || '?'
+  const foto = perfil ? perfil.foto : usuario?.photoURL
   const navigate = useNavigate()
   const navegando = useNavigation().state === 'loading'
   const [q, setQ] = useState('')
@@ -62,7 +64,7 @@ export default function Layout() {
           {!listo ? null : usuario ? (
             <div className="menu">
               <button className="menu__boton" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-label="Menú de usuario">
-                <Avatar nombre={usuario.displayName || '?'} foto={usuario.photoURL} tamano={32} />
+                <Avatar nombre={nombre} foto={foto} tamano={32} />
               </button>
               {menu && (
                 <div className="menu__lista" onClick={() => setMenu(false)}>

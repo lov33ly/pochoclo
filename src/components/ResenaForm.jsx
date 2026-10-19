@@ -10,7 +10,7 @@ const MAX_TEXTO = 2000
 
 // Formulario integrado en la ficha para crear, editar o eliminar la reseña propia.
 export default function ResenaForm({ titulo, existente, enQuieroVer, onListo, onCancelar }) {
-  const { usuario } = useAuth()
+  const { usuario, perfil } = useAuth()
   const { avisar, avisarError } = useToast()
   const [datos, setDatos] = useState(() => ({
     puntaje: existente?.puntaje ?? null,
@@ -33,7 +33,7 @@ export default function ResenaForm({ titulo, existente, enQuieroVer, onListo, on
     setError(null)
     setGuardando(true)
     try {
-      await guardarResena(usuario, titulo, { ...datos, texto: datos.texto.trim() }, !!existente)
+      await guardarResena({ uid: usuario.uid, nombre: perfil?.nombre, displayName: usuario.displayName, photoURL: usuario.photoURL }, titulo, { ...datos, texto: datos.texto.trim() }, !!existente)
       if (enQuieroVer) await quitarQuieroVer(usuario.uid, titulo.tipo, titulo.id).catch(() => {})
       avisar(existente ? 'Reseña actualizada.' : `¡Reseñaste ${titulo.titulo}!`)
       onListo?.()

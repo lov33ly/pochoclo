@@ -1,71 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import { escucharResenasDeUsuario } from '../services/resenas'
-import { escucharPerfil, actualizarBio } from '../services/usuarios'
+import { escucharPerfil } from '../services/usuarios'
 import { escucharQuieroVer } from '../services/quieroVer'
 import { useAuth } from '../context/AuthContext'
-import { useToast } from '../context/ToastContext'
 import { mes } from '../lib/formato'
 import Avatar from '../components/Avatar'
 import Poster from '../components/Poster'
 import Resena from '../components/Resena'
 import PortadaColor from '../components/PortadaColor'
+import EditarPerfil from '../components/EditarPerfil'
 import Pasaporte from '../components/Pasaporte'
 import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
-
-const MAX_BIO = 160
-
-// Bio editable solo en el perfil propio.
-function Bio({ uid, bio, propio }) {
-  const { avisar, avisarError } = useToast()
-  const [editando, setEditando] = useState(false)
-  const [texto, setTexto] = useState(bio)
-  const [guardando, setGuardando] = useState(false)
-
-  async function guardar(e) {
-    e.preventDefault()
-    if (texto.length > MAX_BIO) return
-    setGuardando(true)
-    try {
-      await actualizarBio(uid, texto.trim())
-      avisar('Bio actualizada.')
-      setEditando(false)
-    } catch (err) {
-      avisarError('No se pudo guardar la bio', err)
-    } finally {
-      setGuardando(false)
-    }
-  }
-
-  if (editando)
-    return (
-      <form className="bio bio--editando" onSubmit={guardar}>
-        <input
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-          maxLength={MAX_BIO}
-          placeholder="Ej.: fan del cine coreano y de las comedias de los 90"
-          aria-label="Tu bio"
-          autoFocus
-        />
-        <span className="bio__contador">{texto.length}/{MAX_BIO}</span>
-        <button className="boton boton--chico" disabled={guardando}>{guardando ? '…' : 'Guardar'}</button>
-        <button type="button" className="enlace" onClick={() => { setTexto(bio); setEditando(false) }}>Cancelar</button>
-      </form>
-    )
-
-  return (
-    <p className="bio">
-      {bio || (propio ? 'Todavía no escribiste tu bio.' : '')}
-      {propio && (
-        <button className="enlace bio__editar" onClick={() => setEditando(true)}>
-          {bio ? 'Editar' : 'Escribir bio'}
-        </button>
-      )}
-    </p>
-  )
-}
 
 export default function Perfil() {
   const { uid } = useParams()
@@ -77,6 +24,7 @@ export default function Perfil() {
   const [resenas, setResenas] = useState({ uid: null, lista: [] })
   const [lista, setLista] = useState([])
   const [error, setError] = useState(null)
+  const [editando, setEditando] = useState(false)
 
   useEffect(() => escucharPerfil(uid, (datos) => setPerfil({ uid, datos }), setError), [uid])
   useEffect(() => escucharResenasDeUsuario(uid, (l) => setResenas({ uid, lista: l }), setError), [uid])
@@ -88,16 +36,7 @@ export default function Perfil() {
   const datos = perfil.uid === uid ? perfil.datos : undefined
   const mias = useMemo(() => (resenas.uid === uid ? resenas.lista : []), [resenas, uid])
 
-  const cifras = useMemo(() => {
-    const pelis = mias.filter((r) => r.tipo === 'movie')
-    return {
-      pelis: pelis.length,
-      series: mias.length - pelis.length,
-      horas: Math.round(pelis.reduce((s, r) => s + (r.duracion || 0), 0) / 60),
-      promedio: mias.length ? (mias.reduce((s, r) => s + r.puntaje, 0) / mias.length).toFixed(1) : '–',
-      paises: new Set(mias.flatMap((r) => r.paises || [])).size,
-    }
-  }, [mias])
+  const paises = useMemo(() => new Set(mias.flatMap((r) => r.paises || [])).size, [mias])
 
   // Diario: reseñas agrupadas por el mes en que se vieron.
   const diario = useMemo(() => {
@@ -124,7 +63,7 @@ export default function Perfil() {
   const PESTANAS = [
     ['diario', 'Diario', mias.length],
     ['grilla', 'Pósters', mias.length],
-    ['pasaporte', 'Pasaporte', cifras.paises],
+    ['pasaporte', 'Pasaporte', paises],
     ['stats', 'Estadísticas', null],
     ...(propio ? [['quiero', 'Quiero ver', lista.length]] : []),
   ]
@@ -134,23 +73,23 @@ export default function Perfil() {
       <PortadaColor
         color="negro"
         rotulo={propio ? 'Tu perfil' : 'Perfil'}
-        rotuloDerecha={`${mias.length} reseñas`}
+        rotuloDerecha={`${mias.length} ${mias.length === 1 ? 'reseña' : 'reseñas'}`}
         titulo={datos.nombre}
         proporcion={Math.min(0.3, Math.max(0.12, 2.6 / datos.nombre.length))}
         maximo={300}
         vertical="Diario de cine"
       >
         <div className="perfil__fila">
-          <Avatar nombre={datos.nombre} foto={datos.foto} tamano={72} />
-          <Bio key={datos.bio} uid={uid} bio={datos.bio || ''} propio={propio} />
+          <Avatar nombre={datos.nombre} foto={datos.foto} tamano={96} />
+          <div className="perfil__texto">
+            {datos.bio ? <p className="perfil__bio">{datos.bio}</p> : propio && <p className="perfil__bio perfil__bio--vacia">Todavía no escribiste tu bio.</p>}
+            {propio && (
+              <button className="boton boton--contorno boton--chico" onClick={() => setEditando(true)}>
+                Editar perfil
+              </button>
+            )}
+          </div>
         </div>
-        <dl className="cifras">
-          <div><dt>Películas</dt><dd>{cifras.pelis}</dd></div>
-          <div><dt>Series</dt><dd>{cifras.series}</dd></div>
-          <div><dt>Horas de cine</dt><dd>{cifras.horas}</dd></div>
-          <div><dt>Países</dt><dd>{cifras.paises}</dd></div>
-          <div><dt>Promedio</dt><dd>{String(cifras.promedio).replace('.', ',')}</dd></div>
-        </dl>
       </PortadaColor>
 
       <div className="contenedor pagina">
@@ -179,7 +118,7 @@ export default function Perfil() {
                   <span>{mes(k + '-01')}</span>
                   <span>{rs.length}</span>
                 </h2>
-                {rs.map((r) => <Resena key={r.id} resena={{ ...r, autorNombre: null }} variante="autor" />)}
+                {rs.map((r) => <Resena key={r.id} resena={{ ...r, autorNombre: null }} variante="autor" mostrarSpoiler={propio} />)}
               </section>
             ))
           ))}
@@ -214,6 +153,7 @@ export default function Perfil() {
             </div>
           ))}
       </div>
+      {propio && <EditarPerfil abierto={editando} perfil={datos} onCerrar={() => setEditando(false)} />}
     </div>
   )
 }
