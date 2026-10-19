@@ -16,7 +16,7 @@ import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
 import ResenaForm from '../components/ResenaForm'
 import PortadaColor from '../components/PortadaColor'
-import { resenasTmdb, resenasEjemplo } from '../lib/resenasExtra'
+import { resenasTmdb } from '../lib/resenasExtra'
 
 // Cuanto más corto el título, más alto el titular (siempre ocupa todo el ancho).
 const proporcionTitulo = (t) => Math.min(0.34, Math.max(0.13, 3.4 / t.length))
@@ -56,14 +56,7 @@ export default function Detalle() {
   const mia = usuario ? lista.find((r) => r.id === idResena(usuario.uid, tipo, Number(id))) : null
   const otras = lista.filter((r) => r.id !== mia?.id)
   const deTmdb = useMemo(() => externas.datos || [], [externas.datos])
-
-  // Si entre Pochoclo y TMDB hay menos de 3 reseñas, se completan con reseñas de ejemplo.
-  const ejemplos = useMemo(() => {
-    if (!t || externas.cargando) return []
-    const faltan = 3 - lista.length - deTmdb.length
-    return faltan > 0 ? resenasEjemplo(t, faltan) : []
-  }, [t, externas.cargando, lista.length, deTmdb.length])
-  const todas = useMemo(() => [...lista, ...deTmdb, ...ejemplos], [lista, deTmdb, ejemplos])
+  const todas = useMemo(() => [...lista, ...deTmdb], [lista, deTmdb])
   const enLista = quieroVer.some((q) => q.id === clave)
 
   const comunidad = useMemo(() => {
@@ -241,7 +234,12 @@ export default function Detalle() {
               {mia && !editando && <Resena resena={mia} propia onEditar={() => setEditando(true)} />}
               {otras.map((r) => <Resena key={r.id} resena={r} />)}
               {deTmdb.map((r) => <Resena key={r.id} resena={r} />)}
-              {ejemplos.map((r) => <Resena key={r.id} resena={r} />)}
+              {todas.length === 0 && !externas.cargando && !resenas.error && (
+                <div className="resenas__vacio">
+                  <p className="resenas__vacio-grande">?</p>
+                  <p>Nadie la reseñó todavía. La primera reseña puede ser la tuya.</p>
+                </div>
+              )}
             </div>
           </div>
         </Seccion>

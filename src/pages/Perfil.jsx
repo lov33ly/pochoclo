@@ -11,7 +11,6 @@ import Resena from '../components/Resena'
 import PortadaColor from '../components/PortadaColor'
 import EditarPerfil from '../components/EditarPerfil'
 import Pasaporte from '../components/Pasaporte'
-import Estadisticas from '../components/Estadisticas'
 import { Cargador, ErrorCarga, Vacio } from '../components/Estados'
 
 export default function Perfil() {
@@ -64,7 +63,6 @@ export default function Perfil() {
     ['diario', 'Diario', mias.length],
     ['grilla', 'Pósters', mias.length],
     ['pasaporte', 'Pasaporte', paises],
-    ['stats', 'Estadísticas', null],
     ...(propio ? [['quiero', 'Quiero ver', lista.length]] : []),
   ]
 
@@ -139,7 +137,6 @@ export default function Perfil() {
           ))}
 
         {pestana === 'pasaporte' && <Pasaporte resenas={mias} propio={propio} />}
-        {pestana === 'stats' && <Estadisticas resenas={mias} />}
 
         {pestana === 'quiero' &&
           propio &&

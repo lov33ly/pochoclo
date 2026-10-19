@@ -3,16 +3,19 @@ import { imagen } from '../lib/tmdb'
 import { TIPOS } from '../lib/formato'
 import { EstrellasFijas } from './Estrellas'
 import { marcarTransicion } from '../lib/transicion'
+import { useAuth } from '../context/AuthContext'
 
-// Póster en blanco y negro que recupera el color al pasar el cursor.
+// Póster en blanco y negro; aparece en color si ya lo reseñaste.
 export default function Poster({ titulo, puntaje, mostrarTipo = false, tamano = 'w342', prioridad = false }) {
   const { tipo, id } = titulo
+  const { vistas } = useAuth()
+  const vista = vistas.has(`${tipo}_${id}`)
   return (
     <Link
       to={`/${tipo}/${id}`}
       viewTransition
       onClick={marcarTransicion}
-      className="poster"
+      className={`poster ${vista ? 'poster--vista' : ''}`}
       title={`${titulo.titulo}${titulo.anio ? ` (${titulo.anio})` : ''}`}
     >
       <div className="poster__marco">

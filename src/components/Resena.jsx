@@ -5,16 +5,19 @@ import { fecha, TIPOS } from '../lib/formato'
 import { EstrellasFijas } from './Estrellas'
 import Avatar from './Avatar'
 import { usePerfilPublico } from '../hooks/usePerfilPublico'
+import { useAuth } from '../context/AuthContext'
 
 const LARGO_MAXIMO = 420
 
 // Una reseña como fila tipográfica: puntaje en grande, autor/título, texto y fecha.
 // variante "titulo" (en la ficha: se ve quién reseñó) o "autor" (en perfil e inicio: se ve qué película).
-// origen: "pochoclo" (Firestore), "tmdb" (reseña real de TMDB) o "ejemplo" (inventada).
+// origen: "pochoclo" (Firestore) o "tmdb" (reseña real publicada en TMDB).
 export default function Resena({ resena, variante = 'titulo', propia, mostrarSpoiler, onEditar }) {
   const [revelar, setRevelar] = useState(false)
   const [completa, setCompleta] = useState(false)
   const origen = resena.origen || 'pochoclo'
+  const { vistas } = useAuth()
+  const vista = vistas.has(`${resena.tipo}_${resena.tmdbId}`)
   // Para reseñas de Pochoclo se muestran el nombre y la foto actuales del perfil.
   const perfil = usePerfilPublico(origen === 'pochoclo' && variante === 'titulo' ? resena.uid : null)
   const nombre = perfil?.nombre || resena.autorNombre
@@ -34,7 +37,7 @@ export default function Resena({ resena, variante = 'titulo', propia, mostrarSpo
   return (
     <article className={`resena ${propia ? 'resena--propia' : ''}`}>
       {variante === 'autor' && (
-        <Link to={`/${resena.tipo}/${resena.tmdbId}`} viewTransition className="resena__poster" tabIndex={-1} aria-hidden="true">
+        <Link to={`/${resena.tipo}/${resena.tmdbId}`} viewTransition className={`resena__poster ${vista ? 'resena__poster--vista' : ''}`} tabIndex={-1} aria-hidden="true">
           {resena.poster ? <img src={imagen(resena.poster, 'w154')} alt="" loading="lazy" /> : <span />}
         </Link>
       )}
@@ -85,7 +88,6 @@ export default function Resena({ resena, variante = 'titulo', propia, mostrarSpo
           {origen === 'tmdb' && (
             <a className="resena__origen" href={resena.url} target="_blank" rel="noreferrer">Vía TMDB</a>
           )}
-          {origen === 'ejemplo' && <span className="resena__origen">Ejemplo</span>}
           {propia && onEditar && (
             <button className="enlace" onClick={onEditar}>Editar</button>
           )}

@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
 import { auth, proveedorGoogle } from '../firebase'
 import { asegurarPerfil, escucharPerfil } from '../services/usuarios'
+import { escucharResenasDeUsuario } from '../services/resenas'
 import { useToast } from './ToastContext'
 
 // Traduce los errores más comunes del inicio de sesión a mensajes entendibles.
@@ -20,6 +21,7 @@ export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null)
   const [listo, setListo] = useState(!auth)
   const [perfil, setPerfil] = useState(null)
+  const [misResenas, setMisResenas] = useState([])
   const { avisar } = useToast()
 
   useEffect(() => {
@@ -37,6 +39,13 @@ export function AuthProvider({ children }) {
     return escucharPerfil(usuario.uid, setPerfil, () => {})
   }, [usuario])
 
+  // Títulos que reseñé: sus pósters se muestran en color en toda la app.
+  useEffect(() => {
+    if (!usuario) return
+    return escucharResenasDeUsuario(usuario.uid, setMisResenas, () => {})
+  }, [usuario])
+  const vistas = useMemo(() => new Set(usuario ? misResenas.map((r) => r.clave) : []), [usuario, misResenas])
+
   const entrar = () =>
     signInWithPopup(auth, proveedorGoogle)
       .then((r) => avisar(`¡Hola, ${r.user.displayName?.split(' ')[0] || 'cinéfilo'}!`))
@@ -46,7 +55,7 @@ export function AuthProvider({ children }) {
       })
   const salir = () => signOut(auth)
 
-  return <AuthContext.Provider value={{ usuario, perfil: usuario ? perfil : null, listo, entrar, salir }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ usuario, perfil: usuario ? perfil : null, vistas, listo, entrar, salir }}>{children}</AuthContext.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
