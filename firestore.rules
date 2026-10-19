@@ -47,7 +47,8 @@ service cloud.firestore {
       allow update: if esUsuario(uid)
         && perfilValido(request.resource.data)
         && request.resource.data.creado == resource.data.creado;
-      allow delete: if false;
+      // Solo la propia persona puede borrar su perfil (opción "Eliminar cuenta").
+      allow delete: if esUsuario(uid);
 
       // Lista privada "Quiero ver"
       match /quieroVer/{itemId} {

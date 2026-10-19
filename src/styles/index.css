@@ -884,6 +884,22 @@ a.resena__origen:hover { background: var(--negro); border-color: var(--negro); c
 .avatar { border-radius: 50%; object-fit: cover; flex: none; }
 .avatar--iniciales { display: inline-grid; place-items: center; background: var(--negro); color: var(--blanco); font-family: var(--display); font-weight: 700; border: 1px solid var(--blanco); }
 
+/* ---------- Configuración ---------- */
+
+.perfil__acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.configuracion { max-width: 900px; margin-left: 0; }
+.configuracion .seccion { margin-top: 48px; }
+.configuracion__texto { max-width: 60ch; margin: 0 0 16px; line-height: 1.6; }
+.configuracion__perfil { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.configuracion__perfil > div { flex: 1; min-width: 180px; }
+.configuracion__nombre { margin: 0 0 4px; font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.configuracion__eliminar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; max-width: 560px; }
+.configuracion__eliminar .campo { flex: 1 1 240px; margin: 0; }
+.configuracion__peligro .seccion__cabecera { border-top-color: var(--rojo); }
+.configuracion__peligro .seccion__titulo { color: var(--rojo); }
+.boton--peligro { background: var(--rojo); border-color: var(--rojo); color: var(--blanco); }
+.boton--peligro:hover:not(:disabled) { background: var(--negro); border-color: var(--negro); color: var(--blanco); }
+
 /* ---------- Pasaporte ---------- */
 
 .pasaporte__progreso { max-width: 520px; margin-bottom: 32px; }

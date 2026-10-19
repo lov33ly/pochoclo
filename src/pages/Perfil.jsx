@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 import { escucharResenasDeUsuario } from '../services/resenas'
 import { escucharPerfil } from '../services/usuarios'
 import { escucharQuieroVer } from '../services/quieroVer'
@@ -79,9 +79,14 @@ export default function Perfil() {
           <div className="perfil__texto">
             {datos.bio ? <p className="perfil__bio">{datos.bio}</p> : propio && <p className="perfil__bio perfil__bio--vacia">Todavía no escribiste tu bio.</p>}
             {propio && (
-              <button className="boton boton--contorno boton--chico" onClick={() => setEditando(true)}>
-                Editar perfil
-              </button>
+              <div className="perfil__acciones">
+                <button className="boton boton--contorno boton--chico" onClick={() => setEditando(true)}>
+                  Editar perfil
+                </button>
+                <Link to="/configuracion" viewTransition className="boton boton--contorno boton--chico">
+                  Configuración
+                </Link>
+              </div>
             )}
           </div>
         </div>

@@ -11,6 +11,7 @@ import Detalle from './pages/Detalle'
 import Perfil from './pages/Perfil'
 import Mundo from './pages/Mundo'
 import Pais from './pages/Pais'
+import Configuracion from './pages/Configuracion'
 import NoEncontrado from './pages/NoEncontrado'
 import ErrorRuta from './pages/ErrorRuta'
 import './styles/index.css'
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
           { path: 'mundo/:codigo', Component: Pais },
           { path: ':tipo/:id', Component: Detalle },
           { path: 'u/:uid', Component: Perfil },
+          { path: 'configuracion', Component: Configuracion },
           { path: '*', Component: NoEncontrado },
         ],
       },

@@ -69,6 +69,7 @@ export default function Layout() {
               {menu && (
                 <div className="menu__lista" onClick={() => setMenu(false)}>
                   <Link to={`/u/${usuario.uid}`} viewTransition>Mi perfil</Link>
+                  <Link to="/configuracion" viewTransition>Configuración</Link>
                   <button onClick={salir}>Cerrar sesión</button>
                 </div>
               )}
