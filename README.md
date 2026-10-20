@@ -4,8 +4,8 @@ Red de reseñas de cine y series de todo el mundo, al estilo Letterboxd. Buscá 
 
 **TP2 · Desarrollo Frontend II · 2026**
 
-- Aplicación publicada: `https://REEMPLAZAR.vercel.app`
-- Repositorio: `https://github.com/REEMPLAZAR/pochoclo`
+- Aplicación publicada: **https://pochoclo-pied.vercel.app**
+- Repositorio: https://github.com/lov33ly/pochoclo
 
 ## Funciones
 
@@ -59,7 +59,7 @@ Las reglas validan cada campo (tipos, rangos, largos y valores permitidos) y tod
 Requiere Node.js 20 o superior.
 
 ```bash
-git clone https://github.com/REEMPLAZAR/pochoclo.git
+git clone https://github.com/lov33ly/pochoclo.git
 cd pochoclo
 npm install
 cp .env.example .env    # completar con los datos de Firebase y el token de TMDB
