@@ -14,6 +14,9 @@ import { EstrellasFijas } from '../components/Estrellas'
 import Seccion from '../components/Seccion'
 import Carrusel from '../components/Carrusel'
 import Resena from '../components/Resena'
+import Trailer from '../components/Trailer'
+import DondeVer from '../components/DondeVer'
+import BandaSonora from '../components/BandaSonora'
 import ResenaForm from '../components/ResenaForm'
 import PortadaColor from '../components/PortadaColor'
 import { resenasTmdb } from '../lib/resenasExtra'
@@ -164,6 +167,11 @@ export default function Detalle() {
         </Seccion>
       </div>
 
+      <div className={`contenedor ficha__columnas ${t.trailer ? '' : 'ficha__columnas--una'}`}>
+        <Trailer trailer={t.trailer} titulo={t.titulo} fondo={t.fondo} />
+        <DondeVer dondeVer={t.dondeVer} />
+      </div>
+
       {paleta?.length > 0 && (
         <div className="contenedor">
           <Seccion titulo="Colores de la película">
@@ -243,6 +251,10 @@ export default function Detalle() {
             </div>
           </div>
         </Seccion>
+      </div>
+
+      <div className="contenedor">
+        <BandaSonora titulo={t} />
       </div>
 
       {t.reparto.length > 0 && (

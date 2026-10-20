@@ -832,6 +832,50 @@ a.resena__origen:hover { background: var(--negro); color: var(--blanco); }
 .persona strong { font-family: var(--display); }
 .persona span { color: var(--gris-3); }
 
+/* ---------- Tráiler ---------- */
+
+.ficha__columnas--una { grid-template-columns: 1fr !important; }
+.trailer { position: relative; aspect-ratio: 16 / 9; background: var(--negro); overflow: hidden; }
+.trailer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.trailer__portada { position: absolute; inset: 0; display: block; width: 100%; padding: 0; border: 0; background: var(--negro); color: var(--hueso); text-align: left; }
+.trailer__portada img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.1); opacity: 0.8; transition: filter 0.4s, opacity 0.4s, transform 0.4s; }
+.trailer__portada:hover img { filter: none; opacity: 1; transform: scale(1.03); }
+.trailer__play { position: absolute; left: 50%; top: 50%; display: grid; place-items: center; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%; background: var(--rojo); color: var(--blanco); font-size: 26px; padding-left: 5px; transition: transform 0.2s; }
+.trailer__portada:hover .trailer__play { transform: scale(1.1); }
+.trailer__nombre { position: absolute; left: 12px; right: 12px; bottom: 10px; font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Dónde verla ---------- */
+
+.donde { display: grid; gap: 18px; }
+.donde__etiqueta { margin: 0 0 8px; font-family: var(--display); font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gris-3); }
+.donde__lista { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.donde__plataforma { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; background: var(--blanco); font-family: var(--display); font-size: 13px; font-weight: 700; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.donde__plataforma img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+.donde__plataforma:hover { background: var(--negro); color: var(--hueso); }
+.donde__fuente { margin: 0; font-size: 12px; color: var(--gris-3); }
+
+/* ---------- Banda sonora ---------- */
+
+.banda { display: grid; gap: 24px; }
+@media (min-width: 760px) { .banda { grid-template-columns: 260px 1fr; gap: 40px; align-items: start; } }
+.banda__disco { display: grid; gap: 6px; text-decoration: none; }
+.banda__disco img { width: 100%; max-width: 260px; aspect-ratio: 1; object-fit: cover; filter: grayscale(1); transition: filter 0.4s; }
+.banda__disco:hover img, .banda:has(.activo) .banda__disco img { filter: none; }
+.banda__nombre { font-family: var(--display); font-size: 18px; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+.banda__artista { font-size: 13px; color: var(--gris-3); }
+.banda__temas { margin: 0; padding: 0; list-style: none; border-top: var(--filete); }
+.banda__tema { position: relative; display: grid; grid-template-columns: 28px 30px 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 12px 4px; border: 0; border-bottom: 1px solid var(--gris-2); background: none; text-align: left; overflow: hidden; }
+.banda__tema:hover { background: var(--gris-1); }
+.banda__icono { font-size: 12px; }
+.banda__num { font-family: var(--display); font-size: 12px; font-weight: 700; color: var(--gris-3); font-variant-numeric: tabular-nums; }
+.banda__titulo { display: grid; min-width: 0; font-family: var(--display); font-size: 15px; font-weight: 700; line-height: 1.2; }
+.banda__titulo, .banda__titulo em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banda__titulo em { font-family: var(--texto); font-style: normal; font-weight: 400; font-size: 12px; color: var(--gris-3); }
+.banda__duracion { font-size: 12px; color: var(--gris-3); font-variant-numeric: tabular-nums; }
+.banda__temas .activo .banda__tema { background: var(--negro); color: var(--hueso); }
+.banda__temas .activo .banda__num, .banda__temas .activo .banda__titulo em, .banda__temas .activo .banda__duracion { color: #aaa; }
+.banda__progreso { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--rojo); transition: width 0.25s linear; }
+
 /* ---------- Estrellas ---------- */
 
 .estrellas { display: inline-flex; gap: 1px; color: var(--negro); line-height: 0; }

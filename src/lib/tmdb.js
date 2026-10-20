@@ -51,7 +51,10 @@ export const listar = (datos, tipo) =>
     .map((r) => normalizar(r, tipo))
 
 export async function detalle(tipo, id) {
-  const d = await tmdb(`${tipo}/${id}`, { append_to_response: 'credits,recommendations' })
+  const d = await tmdb(`${tipo}/${id}`, {
+    append_to_response: 'credits,recommendations,videos,watch/providers,translations',
+    include_video_language: 'es,en',
+  })
   const base = normalizar(d, tipo)
   const equipo = d.credits?.crew || []
   return {
@@ -72,5 +75,44 @@ export async function detalle(tipo, id) {
       foto: p.profile_path,
     })),
     recomendadas: listar(d.recommendations || {}, tipo).slice(0, 12),
+    tituloIngles: tituloEnIngles(d.translations?.translations || [], tipo),
+    trailer: elegirTrailer(d.videos?.results || []),
+    dondeVer: plataformas(d['watch/providers']?.results?.AR),
   }
+}
+
+function tituloEnIngles(traducciones, tipo) {
+  const en = traducciones.find((t) => t.iso_639_1 === 'en' && t.iso_3166_1 === 'US') || traducciones.find((t) => t.iso_639_1 === 'en')
+  return (tipo === 'movie' ? en?.data?.title : en?.data?.name) || null
+}
+
+// El mejor video de YouTube: tráiler en español, si no en inglés, si no un teaser.
+function elegirTrailer(videos) {
+  const yt = videos.filter((v) => v.site === 'YouTube')
+  const orden = [
+    (v) => v.type === 'Trailer' && v.iso_639_1 === 'es',
+    (v) => v.type === 'Trailer' && v.official,
+    (v) => v.type === 'Trailer',
+    (v) => v.type === 'Teaser',
+  ]
+  for (const criterio of orden) {
+    const v = yt.find(criterio)
+    if (v) return { clave: v.key, nombre: v.name, idioma: v.iso_639_1 }
+  }
+  return null
+}
+
+// Plataformas donde se puede ver en Argentina (datos de JustWatch vía TMDB).
+function plataformas(ar) {
+  if (!ar) return null
+  const mapear = (lista = []) =>
+    lista.map((p) => ({ id: p.provider_id, nombre: p.provider_name, logo: p.logo_path }))
+  const grupos = {
+    suscripcion: mapear(ar.flatrate),
+    gratis: mapear([...(ar.free || []), ...(ar.ads || [])]),
+    alquiler: mapear(ar.rent),
+    compra: mapear(ar.buy),
+  }
+  const hay = Object.values(grupos).some((g) => g.length)
+  return hay ? { ...grupos, enlace: ar.link } : null
 }
